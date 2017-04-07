@@ -6,8 +6,8 @@ android {
     buildToolsVersion BUILD_TOOLS_VERSION
     defaultConfig {
         applicationId "at.c02.tempus"
-        minSdkVersion 16
-        targetSdkVersion 25
+        minSdkVersion 19 // Android 4.4
+        targetSdkVersion 25 // Android 7.1
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary true
