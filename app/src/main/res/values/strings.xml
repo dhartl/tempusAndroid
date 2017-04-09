@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Tempus</string>
+    <string name="fragment_booking_title">Quickrecord</string>
+    <string name="fragment_booking_list_title">Time Manager</string>
 </resources>
