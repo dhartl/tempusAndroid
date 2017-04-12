@@ -1,24 +1,21 @@
-# android-seed von https://github.com/nitinsmarty/android-seed.git
-This android seed project is developed to start developing any android app without worrying about the basic architectural setup.
-* This project follows MVP (Model-View-Presenter) pattern which is the best pattern to follow in the current scenario of app     development.
-* It uses <a href="http://www.vogella.com/tutorials/Dagger/article.html ">Dagger2</a> for Dependency Injection. 
-  For details on MVP refer to <a href="https://www.captechconsulting.com/blogs/a-mvp-approach-to-lifecycle-safe-requests-with-   retrofit-20-and-rxjava"> MVP Approach using Retrofit and RxAndroid</a>
-* It uses  <a href="https://square.github.io/retrofit/">Retrofit</a> for network calls.
-* It uses  RxAndroid with RxJava for observables to do all the background tasks. Read more about observables 
- <a href="https://github.com/ReactiveX/RxAndroid">here</a>.
-* Picasso is also added in case image downloading is required.
-* It uses <a href="http://jakewharton.github.io/butterknife/">Butter Knife</a> for injecting views and adding click listeners.
+#Tempus-Android
+Eine Beispielapplikation für die Zeiterfassung.
 
-How to start developing your app: 
-* Go through all the links provided above.
-* Clone or Download the project. 
-* Change the package name as per your requirement. Follow <a href= "http://stackoverflow.com/questions/16804093/android-studio-rename-package" >this</a> if you face any diffculty. 
-* Start creating and adding your files as required. 
-* This project contains a basic activity to enter some text and fetch all the states matching that text within india and shows them in a recycler view in different activity. 
-* If you have gone through above links it would be very easy to understand the approach and future development will be easy.
-* I have kept all the views in "view" package, presenter logic in "presenter" package and network calls in "model" package.
+##Überblick über die verwendeten Frameworks
+* HTTP-Kommunikation
+    * [Retrofit](http://square.github.io/retrofit/) für die Kommunikation mit der API.
+    * [Apache OLTU](https://oltu.apache.org/) für die Anmeldung am OpenID-Connect-Server.
+* Dependency-Injection
+    * [Dagger 2](https://google.github.io/dagger/users-guide) für Dependency-Injection der Services.
+    * [Butterknife](http://jakewharton.github.io/butterknife/) für die Injection der Android-Views.
+* Datenbankzugriff
+    * [GreenDAO](http://greenrobot.org/greendao/) für den Zugriff auf die Datenbank.
+* RxJava
+    * [RxJava2](https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0) für asynchrone Verarbeitung in Kombination mit [RxJava2-Adaper für Retrofit](https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2)
+* MVP-Pattern
+    * [Nucleus](https://github.com/konmik/nucleus) für die Aufteilung im MVP-Pattern
 
-Happy coding.
-Contributors are most welcome. 
-
+##Entwicklerinformationen
+Dieses Projekt verwendet die neuen [Java 8 Android Features](https://developer.android.com/guide/platform/j8-jack.html).
+Daher muss derzeit für die Entwicklung die ["Dev"-Variante](https://developer.android.com/studio/preview/index.html) von Android Studio installiert werden
 
