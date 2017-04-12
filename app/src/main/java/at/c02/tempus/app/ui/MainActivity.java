@@ -11,13 +11,13 @@ import at.c02.tempus.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nucleus.factory.RequiresPresenter;
+import nucleus.view.NucleusActivity;
+import nucleus.view.NucleusAppCompatActivity;
 
+@RequiresPresenter(MainActivityPresenter.class)
+public class MainActivity extends NucleusAppCompatActivity<MainActivityPresenter> {
 
-public class MainActivity extends AppCompatActivity {
-
-    private static final String EXTRA_RX = "CALLINWORK";
-    private boolean rxCallInWorks = false;
-    private MainActivityPresenter presenter;
 
     @BindView(R.id.toolbar)
     protected Toolbar toolbar;
@@ -45,33 +45,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         tabLayout.setupWithViewPager(viewPager);
-
-        presenter = new MainActivityPresenter(this);
-        if (savedInstanceState != null) {
-            rxCallInWorks = savedInstanceState.getBoolean(EXTRA_RX);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        presenter.rxUnSubscribe();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //save state for activity recreation
-        outState.putBoolean(EXTRA_RX, rxCallInWorks);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //resume request if activity recreated due to any reason
-        if (rxCallInWorks) {
-            //presenter.loadStateList(searchText);
-        }
     }
 
 }

@@ -2,6 +2,7 @@ package at.c02.tempus.api.api;
 
 import at.c02.tempus.api.CollectionFormats.*;
 import at.c02.tempus.api.model.Employee;
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
@@ -15,7 +16,7 @@ public interface EmployeeApi {
    */
   
   @GET("api/Employee/{userName}")
-  Call<Employee> apiEmployeeByUserNameGet(
+  Observable<Employee> apiEmployeeByUserNameGet(
     @retrofit2.http.Path("userName") String userName
   );
 

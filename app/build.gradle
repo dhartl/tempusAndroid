@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'org.greenrobot.greendao'
 
 android {
@@ -32,12 +31,16 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/rxjava.properties'
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 }
 
 ext {
-    oltu_version = "1.0.1"
-    retrofit_version = "2.1.0"
+    retrofit_version = "2.2.0"
     swagger_annotations_version = "1.5.8"
 }
 
@@ -58,13 +61,13 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp:3.3.1"
     compile "com.squareup.retrofit2:converter-scalars:$retrofit_version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    compile "com.squareup.retrofit2:adapter-rxjava:$retrofit_version"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     compile "com.squareup.okhttp3:logging-interceptor:3.3.1"
-    compile 'io.reactivex:rxandroid:1.2.1'
     compile "io.swagger:swagger-annotations:$swagger_annotations_version"
-    compile "org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version"
-
-
+    compile ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2") {
+        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
+        exclude group: 'org.json', module: 'json'
+    }
 
     // Dependency Injection
     compile 'com.google.dagger:dagger:2.4'
@@ -79,9 +82,19 @@ dependencies {
     // Eventbus
     compile 'org.greenrobot:eventbus:3.0.0'
 
+    //Model-View-Presenter
+    compile 'info.android15.nucleus:nucleus:4.0.0'
+    compile 'info.android15.nucleus:nucleus-support-v7:4.0.0'
+
+    // rxjava
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
+
     testCompile 'junit:junit:4.12'
-    apt 'com.google.dagger:dagger-compiler:2.4'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.4'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }
 
 greendao {

@@ -3,6 +3,8 @@ package at.c02.tempus.api.api;
 import java.util.List;
 
 import at.c02.tempus.api.model.Booking;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -20,7 +22,7 @@ public interface BookingApi {
    */
   
   @GET("api/Booking/{id}")
-  Call<Booking> apiBookingByIdGet(
+  Observable<Booking> apiBookingByIdGet(
     @retrofit2.http.Path("id") Integer id
   );
 
@@ -31,7 +33,7 @@ public interface BookingApi {
    */
   
   @DELETE("api/Booking")
-  Call<Void> apiBookingDelete();
+  Completable apiBookingDelete();
     
 
   /**
@@ -44,7 +46,7 @@ public interface BookingApi {
    */
   
   @GET("api/Booking")
-  Call<List<Booking>> apiBookingGet(
+  Observable<List<Booking>> apiBookingGet(
     @retrofit2.http.Query("employeeId") Integer employeeId, @retrofit2.http.Query("beginDate") String beginDate, @retrofit2.http.Query("completed") Boolean completed
   );
 
@@ -59,7 +61,7 @@ public interface BookingApi {
   	"Content-Type:application/json" 
   })
   @PATCH("api/Booking")
-  Call<Void> apiBookingPatch(
+  Completable apiBookingPatch(
     @retrofit2.http.Body Booking booking
   );
 
@@ -74,7 +76,7 @@ public interface BookingApi {
   	"Content-Type:application/json" 
   })
   @POST("api/Booking")
-  Call<Void> apiBookingPost(
+  Completable apiBookingPost(
     @retrofit2.http.Body Booking booking
   );
 

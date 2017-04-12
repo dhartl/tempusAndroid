@@ -4,6 +4,7 @@ import java.util.List;
 
 import at.c02.tempus.api.CollectionFormats.*;
 import at.c02.tempus.api.model.Project;
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
@@ -16,7 +17,7 @@ public interface ProjectApi {
    */
   
   @GET("api/Project")
-  Call<List<Project>> apiProjectGet();
+  Observable<List<Project>> apiProjectGet();
     
 
 }
