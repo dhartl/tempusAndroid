@@ -1,9 +1,16 @@
 package at.c02.tempus.service;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.List;
+
 import at.c02.tempus.api.api.BookingApi;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.EntityStatus;
 import at.c02.tempus.db.repository.BookingRepository;
+import at.c02.tempus.service.event.BookingChangedEvent;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Daniel on 09.04.2017.
@@ -12,10 +19,12 @@ import at.c02.tempus.db.repository.BookingRepository;
 public class BookingService {
     private BookingApi bookingApi;
     private BookingRepository bookingRepository;
+    private EventBus eventBus;
 
-    public BookingService(BookingApi bookingApi, BookingRepository bookingRepository) {
+    public BookingService(BookingApi bookingApi, BookingRepository bookingRepository, EventBus eventBus) {
         this.bookingApi = bookingApi;
         this.bookingRepository = bookingRepository;
+        this.eventBus = eventBus;
     }
 
     public BookingEntity createOrUpdateBooking(BookingEntity booking) {
@@ -24,7 +33,9 @@ public class BookingService {
         } else {
             booking.setSyncStatus(EntityStatus.MODIFIED);
         }
-        return bookingRepository.createOrUpdate(booking);
+        BookingEntity newBooking = bookingRepository.createOrUpdate(booking);
+        eventBus.post(new BookingChangedEvent(newBooking));
+        return newBooking;
     }
 
     public void deleteBooking(BookingEntity booking) {
@@ -34,6 +45,7 @@ public class BookingService {
             booking.setSyncStatus(EntityStatus.DELETED);
             bookingRepository.createOrUpdate(booking);
         }
+        eventBus.post(new BookingChangedEvent(booking));
     }
 
     public void validateBooking(BookingEntity model) throws RuntimeException{
@@ -49,5 +61,10 @@ public class BookingService {
         if(!model.getEndDate().after(model.getBeginDate())) {
             throw new RuntimeException("Das Enddaum muss nach dem Startdatum sein!");
         }
+        //TODO: überschneidende Buchungszeiten
+    }
+
+    public Observable<List<BookingEntity>> getBookings() {
+        return Observable.fromCallable(()-> bookingRepository.loadBookings());
     }
 }

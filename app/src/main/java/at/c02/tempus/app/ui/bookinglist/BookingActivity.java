@@ -185,7 +185,7 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
 
     public void onSaveSuccessful(BookingEntity model) {
         DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
-        String projectName = model.getProject().getName();
+        String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this,
                 String.format("Die Buchung %s: %s - %s wurde gespeichert",
                         projectName,

@@ -1,5 +1,7 @@
 package at.c02.tempus.service;
 
+import android.util.EventLog;
+
 import com.google.gson.annotations.SerializedName;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,8 +30,8 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public BookingService provideBookingService(BookingApi bookingApi, BookingRepository bookingRepository) {
-        return new BookingService(bookingApi, bookingRepository);
+    public BookingService provideBookingService(BookingApi bookingApi, BookingRepository bookingRepository, EventBus eventBus) {
+        return new BookingService(bookingApi, bookingRepository, eventBus);
     }
 
     @Provides

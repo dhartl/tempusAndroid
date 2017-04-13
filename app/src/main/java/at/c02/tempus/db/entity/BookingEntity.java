@@ -21,8 +21,6 @@ public class BookingEntity {
     private Long id;
 
     private Long externalId;
-    
-    private Long bookingId = null;
 
     private Long projectId;
 
@@ -46,22 +44,22 @@ public class BookingEntity {
     /** Used for active entity operations. */
     @Generated(hash = 1776279694)
     private transient BookingEntityDao myDao;
+    
 
-    @Generated(hash = 518469429)
-    public BookingEntity(Long id, Long externalId, Long bookingId, Long projectId,
-            Long employeeId, Date beginDate, Date endDate, EntityStatus syncStatus) {
+    @Generated(hash = 952443125)
+    public BookingEntity() {
+    }
+
+    @Generated(hash = 1064339433)
+    public BookingEntity(Long id, Long externalId, Long projectId, Long employeeId,
+            Date beginDate, Date endDate, EntityStatus syncStatus) {
         this.id = id;
         this.externalId = externalId;
-        this.bookingId = bookingId;
         this.projectId = projectId;
         this.employeeId = employeeId;
         this.beginDate = beginDate;
         this.endDate = endDate;
         this.syncStatus = syncStatus;
-    }
-
-    @Generated(hash = 952443125)
-    public BookingEntity() {
     }
 
     public Long getId() {
@@ -70,14 +68,6 @@ public class BookingEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getBookingId() {
-        return this.bookingId;
-    }
-
-    public void setBookingId(Long bookingId) {
-        this.bookingId = bookingId;
     }
 
     public Long getProjectId() {

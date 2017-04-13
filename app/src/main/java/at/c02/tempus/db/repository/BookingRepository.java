@@ -1,5 +1,7 @@
 package at.c02.tempus.db.repository;
 
+import java.util.List;
+
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.BookingEntityDao;
 
@@ -22,5 +24,9 @@ public class BookingRepository {
 
     public void delete(BookingEntity entity) {
         dao.delete(entity);
+    }
+
+    public List<BookingEntity> loadBookings() {
+        return dao.loadAllDeepFromCursor(dao.queryBuilder().buildCursor().query());
     }
 }
