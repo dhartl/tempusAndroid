@@ -19,6 +19,10 @@ public class DateUtils {
         return new SimpleDateFormat("HH:mm");
     }
 
+    public static DateFormat getDateTimeFormat() {
+        return new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    }
+
     public static Calendar dateToCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

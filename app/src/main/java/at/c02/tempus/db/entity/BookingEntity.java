@@ -19,6 +19,9 @@ public class BookingEntity {
 
     @Id
     private Long id;
+
+    private Long externalId;
+    
     private Long bookingId = null;
 
     private Long projectId;
@@ -44,10 +47,11 @@ public class BookingEntity {
     @Generated(hash = 1776279694)
     private transient BookingEntityDao myDao;
 
-    @Generated(hash = 381078719)
-    public BookingEntity(Long id, Long bookingId, Long projectId, Long employeeId,
-            Date beginDate, Date endDate, EntityStatus syncStatus) {
+    @Generated(hash = 518469429)
+    public BookingEntity(Long id, Long externalId, Long bookingId, Long projectId,
+            Long employeeId, Date beginDate, Date endDate, EntityStatus syncStatus) {
         this.id = id;
+        this.externalId = externalId;
         this.bookingId = bookingId;
         this.projectId = projectId;
         this.employeeId = employeeId;
@@ -214,6 +218,14 @@ public class BookingEntity {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public Long getExternalId() {
+        return this.externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 
     /** called by internal mechanisms, do not call yourself. */

@@ -102,8 +102,30 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         getView().updateEndDate(newEndDate);
     }
 
+
     public void save() {
-        bookingService.createOrUpdateBooking(model);
+        boolean valid = validate(model);
+        if(valid) {
+            model = bookingService.createOrUpdateBooking(model);
+            getView().onSaveSuccessful(model);
+        }else {
+            getView().onError(error);
+        }
+
     }
 
+    private boolean validate(BookingEntity model) {
+        boolean successful = false;
+        try {
+            bookingService.validateBooking(model);
+            successful = true;
+        }catch(RuntimeException ex) {
+            error = ex;
+        }
+        return successful;
+    }
+
+    public void setProject(ProjectEntity project) {
+        model.setProject(project);
+    }
 }

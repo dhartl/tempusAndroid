@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -12,12 +14,14 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import at.c02.tempus.R;
 import at.c02.tempus.app.ui.utils.DateUtils;
+import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +60,17 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
 
         adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item);
         cbProject.setAdapter(adapter);
+        cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                getPresenter().setProject(adapter.getItem(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                getPresenter().setProject(null);
+            }
+        });
 
     }
 
@@ -66,12 +81,12 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
             date = new Date();
         }
         Calendar calendar = DateUtils.dateToCalendar(date);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, 0, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                getPresenter().setStartDate(year, month, dayOfMonth);
-            }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, 0,
+                (view, year, month, dayOfMonth) ->
+                        getPresenter().setStartDate(year, month, dayOfMonth),
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
         datePickerDialog.show();
     }
@@ -83,12 +98,12 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
             date = new Date();
         }
         Calendar calendar = DateUtils.dateToCalendar(date);
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, 0, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                getPresenter().setStartTime(hourOfDay, minute);
-            }
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, 0,
+                (view, hourOfDay, minute) ->
+                        getPresenter().setStartTime(hourOfDay, minute),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true);
         timePickerDialog.show();
     }
 
@@ -99,14 +114,14 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
             date = new Date();
         }
         Calendar calendar = DateUtils.dateToCalendar(date);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, 0, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                getPresenter().setEndDate(year, month, dayOfMonth);
-            }
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, 0,
+                (view, year, month, dayOfMonth) ->
+                        getPresenter().setEndDate(year, month, dayOfMonth),
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH));
         Date beginDate = getPresenter().getModel().getBeginDate();
-        if(beginDate != null) {
+        if (beginDate != null) {
             datePickerDialog.getDatePicker().setMinDate(beginDate.getTime());
         }
         datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
@@ -120,12 +135,12 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
             date = new Date();
         }
         Calendar calendar = DateUtils.dateToCalendar(date);
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, 0, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                getPresenter().setEndTime(hourOfDay, minute);
-            }
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, 0,
+                (view, hourOfDay, minute) ->
+                        getPresenter().setEndTime(hourOfDay, minute),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true);
         timePickerDialog.show();
     }
 
@@ -161,5 +176,30 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
 
     public void onError(Throwable throwable) {
         Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    @OnClick(R.id.btnOk)
+    protected void onBtnSaveClick() {
+        getPresenter().save();
+    }
+
+    public void onSaveSuccessful(BookingEntity model) {
+        DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
+        String projectName = model.getProject().getName();
+        Toast.makeText(this,
+                String.format("Die Buchung %s: %s - %s wurde gespeichert",
+                        projectName,
+                        dateTimeFormat.format(model.getBeginDate()),
+                        dateTimeFormat.format(model.getEndDate())),
+                Toast.LENGTH_SHORT)
+                .show();
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @OnClick(R.id.btnCancel)
+    protected void onBtnCancelClicked() {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 }
