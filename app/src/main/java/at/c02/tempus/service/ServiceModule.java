@@ -42,8 +42,14 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public ProjectService provideProjectService(ProjectApi projectApi, ProjectRepository projectRepository) {
-        return new ProjectService(projectApi, projectRepository);
+    public ProjectService provideProjectService(ProjectApi projectApi, ProjectRepository projectRepository, EventBus eventBus) {
+        return new ProjectService(projectApi, projectRepository, eventBus);
+    }
+
+    @Provides
+    @Singleton
+    public SyncService provideSnycService(ProjectService projectService) {
+        return new SyncService(projectService);
     }
 
     @Provides

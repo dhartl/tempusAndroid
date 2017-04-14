@@ -1,5 +1,7 @@
 package at.c02.tempus.api;
 
+import android.os.Looper;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
@@ -18,6 +20,7 @@ import at.c02.tempus.api.auth.ApiKeyAuth;
 import at.c02.tempus.api.auth.HttpBasicAuth;
 import at.c02.tempus.api.auth.OAuth;
 import at.c02.tempus.api.auth.OAuth.AccessTokenListener;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -25,6 +28,7 @@ import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
@@ -115,7 +119,7 @@ public class ApiClient {
         adapterBuilder = new Retrofit
                 .Builder()
                 .baseUrl(BASE_URL)
-
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonCustomConverterFactory.create(gson));
 

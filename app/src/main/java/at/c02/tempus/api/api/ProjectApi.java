@@ -17,7 +17,7 @@ public interface ProjectApi {
    */
   
   @GET("api/Project")
-  Observable<List<Project>> apiProjectGet();
+  Observable<List<Project>> loadProjects();
     
 
 }

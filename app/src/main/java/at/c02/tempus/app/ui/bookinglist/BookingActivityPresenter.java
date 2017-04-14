@@ -3,9 +3,11 @@ package at.c02.tempus.app.ui.bookinglist;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.EventLog;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +20,7 @@ import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.service.BookingService;
 import at.c02.tempus.service.ProjectService;
+import at.c02.tempus.service.event.ProjectsChangedEvent;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
@@ -37,12 +40,27 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
     @Inject
     protected ProjectService projectService;
 
+    @Inject
+    protected EventBus eventBus;
+
     private List<ProjectEntity> projects;
     private Throwable error;
 
     public BookingActivityPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
         model = new BookingEntity();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedState) {
+        super.onCreate(savedState);
+        eventBus.register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        eventBus.unregister(this);
+        super.onDestroy();
     }
 
     public BookingEntity getModel() {
@@ -109,10 +127,10 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
 
     public void save() {
         boolean valid = validate(model);
-        if(valid) {
+        if (valid) {
             model = bookingService.createOrUpdateBooking(model);
             getView().onSaveSuccessful(model);
-        }else {
+        } else {
             getView().onError(error);
         }
 
@@ -123,7 +141,7 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         try {
             bookingService.validateBooking(model);
             successful = true;
-        }catch(RuntimeException ex) {
+        } catch (RuntimeException ex) {
             error = ex;
         }
         return successful;
@@ -131,5 +149,11 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
 
     public void setProject(ProjectEntity project) {
         model.setProject(project);
+    }
+
+    @Subscribe
+    public void onProjectsChange(ProjectsChangedEvent event) {
+        this.projects = event.getProjects();
+        publishProjects();
     }
 }
