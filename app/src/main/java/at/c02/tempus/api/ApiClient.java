@@ -31,7 +31,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiClient {
 
-    public static final String BASE_URL="http://10.0.0.2:5001/";
+    public static final String BASE_URL = "http://10.0.2.2:5000/";
 
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder;
