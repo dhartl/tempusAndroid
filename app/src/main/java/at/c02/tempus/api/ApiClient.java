@@ -121,7 +121,7 @@ public class ApiClient {
                 .baseUrl(BASE_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonCustomConverterFactory.create(gson));
+                .addConverterFactory(GsonConverterFactory.create(gson));
 
 
     }
@@ -305,55 +305,3 @@ public class ApiClient {
     }
 }
 
-/**
- * This wrapper is to take care of this case:
- * when the deserialization fails due to JsonParseException and the
- * expected type is String, then just return the body string.
- */
-class GsonResponseBodyConverterToString<T> implements Converter<ResponseBody, T> {
-    private final Gson gson;
-    private final Type type;
-
-    GsonResponseBodyConverterToString(Gson gson, Type type) {
-        this.gson = gson;
-        this.type = type;
-    }
-
-    @Override
-    public T convert(ResponseBody value) throws IOException {
-        String returned = value.string();
-        try {
-            return gson.fromJson(returned, type);
-        } catch (JsonParseException e) {
-            return (T) returned;
-        }
-    }
-}
-
-class GsonCustomConverterFactory extends Converter.Factory {
-    public static GsonCustomConverterFactory create(Gson gson) {
-        return new GsonCustomConverterFactory(gson);
-    }
-
-    private final Gson gson;
-    private final GsonConverterFactory gsonConverterFactory;
-
-    private GsonCustomConverterFactory(Gson gson) {
-        if (gson == null) throw new NullPointerException("gson == null");
-        this.gson = gson;
-        this.gsonConverterFactory = GsonConverterFactory.create(gson);
-    }
-
-    @Override
-    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
-        if (type.equals(String.class))
-            return new GsonResponseBodyConverterToString<Object>(gson, type);
-        else
-            return gsonConverterFactory.responseBodyConverter(type, annotations, retrofit);
-    }
-
-    @Override
-    public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit) {
-        return gsonConverterFactory.requestBodyConverter(type, parameterAnnotations, methodAnnotations, retrofit);
-    }
-}
