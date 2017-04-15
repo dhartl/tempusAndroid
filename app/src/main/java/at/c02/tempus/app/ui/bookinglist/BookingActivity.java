@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -221,5 +223,30 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
         if (project != null) {
             cbProject.setSelection(adapter.getPosition(project));
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(getIntent().hasExtra(EXTRA_BOOKING_ID)) {
+            getMenuInflater().inflate(R.menu.booking_activity_menu, menu);
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                onBackPressed();
+                return true;
+            }
+            case R.id.miDelete: {
+                getPresenter().deleteBooking();
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

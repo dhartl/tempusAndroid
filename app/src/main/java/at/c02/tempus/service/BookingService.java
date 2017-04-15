@@ -248,8 +248,9 @@ public class BookingService {
                 syncResult.setItemChange(ItemChange.NOT_CHANGED);
                 break;
         }
-        syncResult.setSource(BookingMapping.toBookingEntity(newBooking));
-
+        if(newBooking != null) {
+            syncResult.setSource(BookingMapping.toBookingEntity(newBooking));
+        }
         return syncResult;
     }
 

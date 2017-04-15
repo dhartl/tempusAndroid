@@ -197,4 +197,8 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         this.projects = event.getProjects();
         publishProjects();
     }
+
+    public void deleteBooking() {
+        bookingService.deleteBooking(model);
+    }
 }
