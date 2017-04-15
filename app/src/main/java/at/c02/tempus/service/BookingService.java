@@ -98,7 +98,7 @@ public class BookingService {
     }
 
     public Observable<List<BookingEntity>> getBookings() {
-        return Observable.fromCallable(() -> bookingRepository.loadBookings());
+        return Observable.fromCallable(() -> bookingRepository.loadAllDeep());
     }
 
     public Observable<Optional<BookingEntity>> getLastBooking() {
@@ -185,7 +185,7 @@ public class BookingService {
                     }
                     Log.d(TAG, "Bookings Synchronisation abgeschlossen");
                     if (emitChangedEvent) {
-                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadBookings()));
+                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
                     }
                     return emitChangedEvent;
                 });
@@ -205,7 +205,7 @@ public class BookingService {
                     }
                     Log.d(TAG, "Bookings Publishing abgeschlossen");
                     if (emitChangedEvent) {
-                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadBookings()));
+                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
                     }
                     return emitChangedEvent;
                 });

@@ -39,9 +39,8 @@ public class ProjectService {
     }
 
     public Observable<List<ProjectEntity>> getProjects() {
-
         return Observable.fromCallable(() -> {
-            return projectRepository.loadProjects();
+            return projectRepository.findAll();
         });
     }
 
@@ -49,7 +48,7 @@ public class ProjectService {
         projectApi.loadProjects()
                 .map(projects -> CollectionUtils.convertList(projects, ProjectMapping::toProjectEntity))
                 .map(apiProjectEntities -> {
-                    List<ProjectEntity> projectEntities = projectRepository.loadProjects();
+                    List<ProjectEntity> projectEntities = projectRepository.findAll();
                     Log.d(TAG, "Syncronisiere Projekte: " + apiProjectEntities.size() + " externe Projekte, "
                             + projectEntities.size() + " Projekte in Datenbank");
                     return syncStatusFinder.findSyncStatus(apiProjectEntities, projectEntities);
@@ -65,7 +64,7 @@ public class ProjectService {
                     }
                     Log.d(TAG, "Projekt Synchronisation abgeschlossen");
                     if (emitChangedEvent) {
-                        eventBus.post(new ProjectsChangedEvent(projectRepository.loadProjects()));
+                        eventBus.post(new ProjectsChangedEvent(projectRepository.findAll()));
                     }
                 }, throwable -> Log.e(TAG, "Fehler bei der Projektsynchronisation", throwable));
     }

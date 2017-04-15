@@ -43,7 +43,7 @@ public class EmployeeService {
     public void loadEmployee() {
         employeeApi.findEmployeeByUserName(CURRENT_USER).map(EmployeeMapping::toEmployeeEntity)
                 .map(employee -> {
-                    List<EmployeeEntity> targetEmployee = employeeRepository.loadAll();
+                    List<EmployeeEntity> targetEmployee = employeeRepository.findAll();
                     Log.d(TAG, "Syncronisiere Employee: " + targetEmployee.size() + ", externer Employee: "
                             + employee);
 

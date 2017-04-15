@@ -13,30 +13,16 @@ import at.c02.tempus.db.entity.ProjectEntity;
  * Created by Daniel on 09.04.2017.
  */
 
-public class EmployeeRepository {
+public class EmployeeRepository extends AbstractRepository<EmployeeEntity, Long, EmployeeEntityDao>{
 
-    private EmployeeEntityDao dao;
 
     public EmployeeRepository(EmployeeEntityDao dao) {
-        this.dao = dao;
+        super(dao);
     }
 
     public EmployeeEntity findByUserName(String userName) {
         return dao.queryBuilder()
                 .where(EmployeeEntityDao.Properties.UserName.like(userName))
                 .unique();
-    }
-
-    public List<EmployeeEntity> loadAll() {
-        return dao.loadAll();
-    }
-
-    public EmployeeEntity createOrUpdate(EmployeeEntity entity) {
-        dao.save(entity);
-        return entity;
-    }
-
-    public void delete(EmployeeEntity entity) {
-        dao.delete(entity);
     }
 }

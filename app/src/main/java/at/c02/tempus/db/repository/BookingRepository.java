@@ -11,24 +11,13 @@ import at.c02.tempus.db.entity.EntityStatus;
  * Klasse für Queries auf Booking-Tabelle
  * Created by Daniel on 09.04.2017.
  */
-public class BookingRepository {
-
-    private BookingEntityDao dao;
+public class BookingRepository extends AbstractRepository<BookingEntity, Long, BookingEntityDao>{
 
     public BookingRepository(BookingEntityDao dao) {
-        this.dao = dao;
+        super(dao);
     }
 
-    public BookingEntity createOrUpdate(BookingEntity entity) {
-        dao.save(entity);
-        return entity;
-    }
-
-    public void delete(BookingEntity entity) {
-        dao.delete(entity);
-    }
-
-    public List<BookingEntity> loadBookings() {
+    public List<BookingEntity> loadAllDeep() {
         return dao.queryDeep("");
     }
 
