@@ -105,7 +105,7 @@ public class ApiClient {
 
     public void createDefaultAdapter() {
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .create();
 
         okBuilder = new OkHttpClient.Builder();

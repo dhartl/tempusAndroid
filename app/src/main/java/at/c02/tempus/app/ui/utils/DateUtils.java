@@ -23,6 +23,17 @@ public class DateUtils {
         return new SimpleDateFormat("dd.MM.yyyy HH:mm");
     }
 
+    private static DateFormat getQueryDateFormat() {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    }
+
+    public static String formatQueryDate(Date date) {
+        if(date == null) {
+            return null;
+        }
+        return getQueryDateFormat().format(date);
+    }
+
     public static Calendar dateToCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
