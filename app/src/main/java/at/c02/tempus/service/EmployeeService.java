@@ -15,6 +15,7 @@ import at.c02.tempus.service.event.EmployeeChangedEvent;
 import at.c02.tempus.service.mapping.EmployeeMapping;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
+import at.c02.tempus.service.sync.UpdateDetectorFactory;
 import io.reactivex.Observable;
 
 /**
@@ -31,8 +32,8 @@ public class EmployeeService {
     private EventBus eventBus;
 
     private SyncStatusFinder<EmployeeEntity> syncStatusFinder = new SyncStatusFinder<>(EmployeeEntity::getExternalId,
-            (source, target) -> !(Objects.equals(source.getFirstName(), target.getFirstName()) &&
-                    Objects.equals(source.getLastName(), target.getLastName())));
+            UpdateDetectorFactory.create(EmployeeEntity::getFirstName,
+                    EmployeeEntity::getLastName));
 
     public EmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository, EventBus eventBus) {
         this.employeeApi = employeeApi;

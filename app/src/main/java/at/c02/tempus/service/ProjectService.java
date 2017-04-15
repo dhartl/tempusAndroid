@@ -16,6 +16,7 @@ import at.c02.tempus.service.event.ProjectsChangedEvent;
 import at.c02.tempus.service.mapping.ProjectMapping;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
+import at.c02.tempus.service.sync.UpdateDetectorFactory;
 import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
@@ -30,7 +31,7 @@ public class ProjectService {
     private EventBus eventBus;
 
     private SyncStatusFinder<ProjectEntity> syncStatusFinder = new SyncStatusFinder<>(ProjectEntity::getExternalId,
-            (source, target) -> !Objects.equals(source.getName(), target.getName()));
+            UpdateDetectorFactory.create(ProjectEntity::getName));
 
     public ProjectService(ProjectApi projectApi, ProjectRepository projectRepository, EventBus eventBus) {
         this.projectApi = projectApi;

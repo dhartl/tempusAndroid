@@ -26,6 +26,7 @@ import at.c02.tempus.service.mapping.MappingUtils;
 import at.c02.tempus.service.sync.ItemChange;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
+import at.c02.tempus.service.sync.UpdateDetectorFactory;
 import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
@@ -43,10 +44,10 @@ public class BookingService {
     private ProjectService projectService;
 
     private SyncStatusFinder<BookingEntity> syncStatusFinder = new SyncStatusFinder<>(item -> item.getExternalId(),
-            (source, target) -> !(Objects.equals(source.getEmployeeId(), target.getEmployee()) &&
-                    Objects.equals(source.getProjectId(), target.getProjectId()) &&
-                    Objects.equals(source.getBeginDate(), target.getBeginDate()) &&
-                    Objects.equals(source.getEndDate(), target.getEndDate())));
+            UpdateDetectorFactory.create(BookingEntity::getEmployeeId,
+                    BookingEntity::getProjectId,
+                    BookingEntity::getBeginDate,
+                    BookingEntity::getEndDate));
 
     public BookingService(BookingApi bookingApi,
                           BookingRepository bookingRepository,
