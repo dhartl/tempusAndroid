@@ -24,8 +24,8 @@ public class BookingMapping {
     public static BookingEntity toBookingEntity(Booking booking) {
         BookingEntity entity = new BookingEntity();
         entity.setExternalId(MappingUtils.fromInt(booking.getBookingId()));
-        entity.setBeginDate(entity.getBeginDate());
-        entity.setEndDate(entity.getEndDate());
+        entity.setBeginDate(booking.getBeginDate());
+        entity.setEndDate(booking.getEndDate());
         entity.setEmployeeId(MappingUtils.fromInt(booking.getEmployeeId()));
         entity.setProjectId(MappingUtils.fromInt(booking.getProjectId()));
         entity.setSyncStatus(EntityStatus.SYNCED);

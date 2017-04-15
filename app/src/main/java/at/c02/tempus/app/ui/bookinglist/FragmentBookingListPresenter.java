@@ -14,6 +14,7 @@ import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.service.BookingService;
 import at.c02.tempus.service.event.BookingChangedEvent;
+import at.c02.tempus.service.event.BookingsChangedEvent;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
@@ -53,7 +54,7 @@ public class FragmentBookingListPresenter extends Presenter<FragmentBookingList>
     @Override
     protected void onTakeView(FragmentBookingList fragmentBookingList) {
         super.onTakeView(fragmentBookingList);
-        if(bookings != null) {
+        if (bookings != null) {
             getView().showItems(bookings);
         }
     }
@@ -67,20 +68,25 @@ public class FragmentBookingListPresenter extends Presenter<FragmentBookingList>
 
     private void onBookingsLoaded(List<BookingEntity> bookings) {
         this.bookings = bookings;
-        if(getView() != null) {
+        if (getView() != null) {
             getView().showItems(bookings);
         }
     }
 
     private void onError(Throwable error) {
         this.error = error;
-        if(getView() != null) {
+        if (getView() != null) {
             getView().onError(error);
         }
     }
 
     @Subscribe
     public void onBookingChangedEvent(BookingChangedEvent event) {
+        loadBookings();
+    }
+
+    @Subscribe
+    public void onBookingsChangedEvent(BookingsChangedEvent event) {
         loadBookings();
     }
 }

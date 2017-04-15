@@ -7,6 +7,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import at.c02.tempus.api.model.Booking;
+import at.c02.tempus.service.event.BookingChangedEvent;
 
 /**
  * Created by Daniel Hartl on 14.04.2017.
@@ -40,7 +41,7 @@ public class SyncService {
     }
 
     @Subscribe
-    public void onBookingChangedEvent(Booking booking) {
+    public void onBookingChangedEvent(BookingChangedEvent booking) {
         Log.d(TAG, "Sync of Bookings started");
         bookingService.synchronizeBookings();
     }

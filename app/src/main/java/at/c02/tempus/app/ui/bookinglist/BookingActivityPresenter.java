@@ -32,7 +32,7 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
 
     private static final String TAG = "BookingActivityPres";
 
-    private BookingEntity model;
+    private BookingEntity model = new BookingEntity();
 
     @Inject
     protected BookingService bookingService;

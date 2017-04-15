@@ -147,21 +147,19 @@ public class BookingService {
     }
 
     public void synchronizeBookings() {
-        publishBookings();
-
-    }
-
-    private void publishBookings() {
         Observable<Boolean> bookingsToServer = syncBookingsToServer();
         Observable<Boolean> bookingsFromServer = syncBookingsFromServer();
 
         Observable.concat(bookingsToServer, bookingsFromServer).subscribe(result -> {
                 }, error -> Log.e(TAG, "Fehler bei der Synchronisation von Buchungen", error)
         );
+
     }
 
     private Observable<Boolean> syncBookingsFromServer() {
+        Log.d(TAG, "Sending Bookings to Server");
         return bookingApi.findBookingsForEmployeeAndDate(
+                //FIXME: Buchungssynchronisation darf erst nach Employee-Synchronisation laufen!
                 MappingUtils.fromLong(employeeService.getCurrentEmployee().blockingFirst().getExternalId()),
                 at.c02.tempus.app.ui.utils.DateUtils.formatQueryDate(
                         at.c02.tempus.app.ui.utils.DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
@@ -202,9 +200,13 @@ public class BookingService {
 
     private Observable<Boolean> syncBookingsToServer() {
         return Observable.fromCallable(() -> bookingRepository.findModifiedEntries())
-                .flatMap(Observable::fromIterable)
-                .map(this::publishBooking)
-                .toList()
+                .map(bookingEntities -> {
+                    List<SyncResult> results = new ArrayList<>();
+                    for (BookingEntity booking : bookingEntities) {
+                        results.add(publishBooking(booking));
+                    }
+                    return results;
+                })
                 .map(syncResults -> {
                     boolean emitChangedEvent = false;
                     for (SyncResult<BookingEntity> syncResult : syncResults) {
@@ -219,7 +221,7 @@ public class BookingService {
                         eventBus.post(new BookingsChangedEvent(bookingRepository.loadBookings()));
                     }
                     return emitChangedEvent;
-                }).toObservable();
+                });
     }
 
     private SyncResult<BookingEntity> publishBooking(BookingEntity bookingEntity) {

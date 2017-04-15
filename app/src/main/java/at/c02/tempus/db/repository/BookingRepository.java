@@ -50,9 +50,9 @@ public class BookingRepository {
     public List<BookingEntity> findModifiedEntries() {
         return dao.queryBuilder()
                 .where(BookingEntityDao.Properties.SyncStatus.in(
-                        EntityStatus.DELETED,
-                        EntityStatus.MODIFIED,
-                        EntityStatus.NEW
+                        EntityStatus.DELETED.getId(),
+                        EntityStatus.MODIFIED.getId(),
+                        EntityStatus.NEW.getId()
                 )).list();
     }
 
