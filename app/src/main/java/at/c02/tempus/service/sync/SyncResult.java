@@ -9,9 +9,24 @@ public class SyncResult<T> {
     private T source;
     private T target;
 
+    public SyncResult() {
+    }
+
     public SyncResult(ItemChange itemChange, T source, T target) {
         this.itemChange = itemChange;
         this.source = source;
+        this.target = target;
+    }
+
+    public void setItemChange(ItemChange itemChange) {
+        this.itemChange = itemChange;
+    }
+
+    public void setSource(T source) {
+        this.source = source;
+    }
+
+    public void setTarget(T target) {
         this.target = target;
     }
 

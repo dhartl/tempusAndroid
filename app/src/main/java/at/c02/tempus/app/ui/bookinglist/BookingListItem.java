@@ -78,8 +78,10 @@ public class BookingListItem extends AbstractFlexibleItem<BookingListItem.Bookin
     @Override
     public void bindViewHolder(FlexibleAdapter adapter, BookingListItemViewHolder holder, int position, List payloads) {
         DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
-        holder.text1.setText(dateTimeFormat.format(beginDate) + " - "
-                + dateTimeFormat.format(endDate));
+        holder.text1.setText((beginDate != null ? dateTimeFormat.format(beginDate) : "?")
+                + " - "
+                + (endDate != null ? dateTimeFormat.format(endDate) : "?")
+        );
         holder.text2.setText(projectName);
     }
 

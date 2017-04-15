@@ -43,8 +43,11 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public SyncService provideSnycService(ProjectService projectService, EmployeeService employeeService) {
-        return new SyncService(projectService, employeeService);
+    public SyncService provideSnycService(ProjectService projectService,
+                                          EmployeeService employeeService,
+                                          BookingService bookingService,
+                                          EventBus eventBus) {
+        return new SyncService(projectService, employeeService, bookingService, eventBus);
     }
 
     @Provides
