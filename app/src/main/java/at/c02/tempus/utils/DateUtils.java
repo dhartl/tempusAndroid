@@ -1,4 +1,4 @@
-package at.c02.tempus.app.ui.utils;
+package at.c02.tempus.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

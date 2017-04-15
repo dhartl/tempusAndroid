@@ -1,12 +1,10 @@
 package at.c02.tempus.api.api;
 
-import java.util.Date;
 import java.util.List;
 
 import at.c02.tempus.api.model.Booking;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;

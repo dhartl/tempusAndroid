@@ -1,10 +1,7 @@
 package at.c02.tempus.app.ui.bookinglist;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.EventLog;
-import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -15,7 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
-import at.c02.tempus.app.ui.utils.DateUtils;
+import at.c02.tempus.utils.DateUtils;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.service.BookingService;

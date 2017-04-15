@@ -9,7 +9,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-import at.c02.tempus.app.ui.utils.DateUtils;
+import at.c02.tempus.utils.DateUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import eu.davidea.flexibleadapter.FlexibleAdapter;

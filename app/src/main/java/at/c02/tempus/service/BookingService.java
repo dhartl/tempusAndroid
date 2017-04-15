@@ -133,7 +133,7 @@ public class BookingService {
                     }
                     newBooking.setProject(project);
                     if (startDate == null) {
-                        startDate = at.c02.tempus.app.ui.utils.DateUtils.setTime(now, 8, 0);
+                        startDate = at.c02.tempus.utils.DateUtils.setTime(now, 8, 0);
                     }
                     newBooking.setBeginDate(startDate);
 
@@ -161,8 +161,8 @@ public class BookingService {
         return bookingApi.findBookingsForEmployeeAndDate(
                 //FIXME: Buchungssynchronisation darf erst nach Employee-Synchronisation laufen!
                 MappingUtils.fromLong(employeeService.getCurrentEmployee().blockingFirst().getExternalId()),
-                at.c02.tempus.app.ui.utils.DateUtils.formatQueryDate(
-                        at.c02.tempus.app.ui.utils.DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
+                at.c02.tempus.utils.DateUtils.formatQueryDate(
+                        at.c02.tempus.utils.DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
                 true
         ).map(this::mapBookingsToEntity)
                 .map(sourceBookings -> {

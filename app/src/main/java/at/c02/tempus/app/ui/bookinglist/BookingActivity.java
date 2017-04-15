@@ -3,8 +3,6 @@ package at.c02.tempus.app.ui.bookinglist;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,9 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.Spinner;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.DateFormat;
@@ -23,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import at.c02.tempus.R;
-import at.c02.tempus.app.ui.utils.DateUtils;
+import at.c02.tempus.utils.DateUtils;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import butterknife.BindView;
