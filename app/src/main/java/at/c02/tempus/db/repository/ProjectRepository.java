@@ -30,4 +30,10 @@ public class ProjectRepository {
     public List<ProjectEntity> loadProjects() {
         return dao.loadAll();
     }
+
+    public ProjectEntity findDefaultProject() {
+        return dao.queryBuilder()
+                .limit(1)
+                .unique();
+    }
 }

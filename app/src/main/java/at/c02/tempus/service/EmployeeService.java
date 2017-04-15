@@ -61,18 +61,22 @@ public class EmployeeService {
                         try {
                             emitChangedEvent |= applySyncResult(syncResult);
                         } catch (Exception ex) {
-                            Log.e(TAG, "Fehler bei der Synchronisation von Projekten; " + syncResult, ex);
+                            Log.e(TAG, "Fehler bei der Synchronisation von Employees; " + syncResult, ex);
                         }
                     }
-                    Log.d(TAG, "Projekt Synchronisation abgeschlossen");
+                    Log.d(TAG, "Employee Synchronisation abgeschlossen");
                     if (emitChangedEvent) {
                         eventBus.post(new EmployeeChangedEvent(employeeRepository.findByUserName(CURRENT_USER)));
                     }
-                }, throwable -> Log.e(TAG, "Fehler bei der Projektsynchronisation", throwable));
+                }, throwable -> Log.e(TAG, "Fehler bei der Employeesynchronisation", throwable));
     }
 
     public Observable<EmployeeEntity> getCurrentEmployee() {
-        return Observable.fromCallable(() -> employeeRepository.findByUserName(CURRENT_USER));
+        return Observable.fromCallable(() -> {
+            EmployeeEntity currentUser = employeeRepository.findByUserName(CURRENT_USER);
+            Log.d(TAG, "current employee: " + currentUser);
+            return currentUser;
+        });
     }
 
     private EmployeeEntity convertEmployeeToEntity(Employee employee) {

@@ -202,4 +202,10 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
         setResult(RESULT_CANCELED);
         finish();
     }
+
+    public void updateProject(ProjectEntity project) {
+        if (project != null) {
+            cbProject.setSelection(adapter.getPosition(project));
+        }
+    }
 }

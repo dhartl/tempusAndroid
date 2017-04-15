@@ -21,8 +21,12 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public BookingService provideBookingService(BookingApi bookingApi, BookingRepository bookingRepository, EventBus eventBus) {
-        return new BookingService(bookingApi, bookingRepository, eventBus);
+    public BookingService provideBookingService(BookingApi bookingApi,
+                                                BookingRepository bookingRepository,
+                                                EventBus eventBus,
+                                                EmployeeService employeeService,
+                                                ProjectService projectService) {
+        return new BookingService(bookingApi, bookingRepository, eventBus, employeeService, projectService);
     }
 
     @Provides

@@ -27,6 +27,17 @@ public class BookingRepository {
     }
 
     public List<BookingEntity> loadBookings() {
-        return dao.loadAllDeepFromCursor(dao.queryBuilder().buildCursor().query());
+        return dao.queryDeep("");
+    }
+
+    public BookingEntity findLastBooking() {
+        BookingEntity bookingEntity = dao.queryBuilder()
+                .orderDesc(BookingEntityDao.Properties.BeginDate)
+                .limit(1)
+                .unique();
+        if (bookingEntity != null) {
+            bookingEntity.getProject();
+        }
+        return bookingEntity;
     }
 }

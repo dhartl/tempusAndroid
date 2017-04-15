@@ -23,7 +23,7 @@ public class EmployeeRepository {
 
     public EmployeeEntity findByUserName(String userName) {
         return dao.queryBuilder()
-                .where(EmployeeEntityDao.Properties.UserName.eq(userName))
+                .where(EmployeeEntityDao.Properties.UserName.like(userName))
                 .unique();
     }
 

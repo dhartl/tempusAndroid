@@ -48,13 +48,32 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
 
     public BookingActivityPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
-        model = new BookingEntity();
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
         eventBus.register(this);
+
+        projectService.getProjects()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                            this.projects = result;
+                            publishProjects();
+                        }, error -> {
+                            this.error = error;
+                            publishProjects();
+                        }
+                );
+        bookingService.createNewBooking()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    this.model = result;
+                    publishBooking();
+                }, error -> {
+                    this.error = error;
+                    publishBooking();
+                });
     }
 
     @Override
@@ -71,23 +90,21 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         this.model = model;
     }
 
-    @Override
-    protected void onTakeView(BookingActivity bookingActivity) {
-        super.onTakeView(bookingActivity);
-        Log.d(TAG, "onTakeView");
-        bookingActivity.updateStartDate(model.getBeginDate());
-        bookingActivity.updateEndDate(model.getEndDate());
-        projectService.getProjects()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                            this.projects = result;
-                            publishProjects();
-                        }, error -> {
-                            this.error = error;
-                            publishProjects();
-                        }
-
-                );
+    private void publishBooking() {
+        if (getView() != null) {
+            if (model != null) {
+                getView().updateStartDate(model.getBeginDate());
+                getView().updateEndDate(model.getEndDate());
+                getView().updateProject(model.getProject());
+            } else {
+                getView().updateStartDate(null);
+                getView().updateEndDate(null);
+                getView().updateProject(null);
+                if (error != null) {
+                    getView().onError(error);
+                }
+            }
+        }
     }
 
     private void publishProjects() {
@@ -148,7 +165,9 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
     }
 
     public void setProject(ProjectEntity project) {
-        model.setProject(project);
+        if (model != null) {
+            model.setProject(project);
+        }
     }
 
     @Subscribe

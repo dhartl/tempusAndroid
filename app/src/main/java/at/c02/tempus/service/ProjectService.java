@@ -2,6 +2,8 @@ package at.c02.tempus.service;
 
 import android.util.Log;
 
+import com.fernandocejas.arrow.optional.Optional;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
@@ -92,6 +94,10 @@ public class ProjectService {
                 break;
         }
         return changed;
+    }
+
+    public Observable<Optional<ProjectEntity>> getDefaultProject() {
+        return Observable.fromCallable(()-> Optional.fromNullable(projectRepository.findDefaultProject()));
     }
 
     private List<ProjectEntity> convertAllProjectsToEntities(List<Project> projects) {
