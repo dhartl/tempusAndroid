@@ -48,6 +48,12 @@ public class FragmentBookingList extends NucleusSupportFragment<FragmentBookingL
         getActivity().startActivity(intent);
     }
 
+    protected void editBooking(Long bookingId) {
+        Intent intent = new Intent(getActivity(), BookingActivity.class);
+        intent.putExtra(BookingActivity.EXTRA_BOOKING_ID, bookingId);
+        getActivity().startActivity(intent);
+    }
+
     public void showItems(List<BookingEntity> bookings) {
         List<BookingListItem> listItems = new ArrayList<>();
         for (BookingEntity booking : bookings) {
@@ -59,6 +65,15 @@ public class FragmentBookingList extends NucleusSupportFragment<FragmentBookingL
         }
         if (adapter == null) {
             adapter = new FlexibleAdapter<>(listItems);
+            adapter.addListener(new FlexibleAdapter.OnItemClickListener() {
+
+                @Override
+                public boolean onItemClick(int index) {
+                    BookingListItem item = adapter.getItem(index);
+                    editBooking(item.getId());
+                    return true;
+                }
+            });
             recyclerView.setAdapter(adapter);
         } else {
             adapter.updateDataSet(listItems);

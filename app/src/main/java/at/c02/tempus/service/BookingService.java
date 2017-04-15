@@ -114,7 +114,7 @@ public class BookingService {
                             startDate = previousEndDate;
                         }
                     }
-                    if(project == null) {
+                    if (project == null) {
                         project = projectService.getDefaultProject().singleElement().blockingGet().orNull();
                     }
                     newBooking.setProject(project);
@@ -126,5 +126,9 @@ public class BookingService {
                     newBooking.setEndDate(null);
                     return newBooking;
                 });
+    }
+
+    public Observable<Optional<BookingEntity>> getBookingById(Long id) {
+        return Observable.fromCallable(() -> Optional.fromNullable(bookingRepository.findBookingById(id)));
     }
 }

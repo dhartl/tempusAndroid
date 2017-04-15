@@ -34,6 +34,21 @@ public class BookingListItem extends AbstractFlexibleItem<BookingListItem.Bookin
         this.endDate = endDate;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public Date getBeginDate() {
+        return beginDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
 
     @Override
     public boolean equals(Object o) {

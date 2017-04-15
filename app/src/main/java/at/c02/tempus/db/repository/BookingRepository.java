@@ -40,4 +40,8 @@ public class BookingRepository {
         }
         return bookingEntity;
     }
+
+    public BookingEntity findBookingById(Long id) {
+        return dao.loadDeep(id);
+    }
 }

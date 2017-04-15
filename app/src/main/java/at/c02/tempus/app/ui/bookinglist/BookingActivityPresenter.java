@@ -65,21 +65,43 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
                             publishProjects();
                         }
                 );
-        bookingService.createNewBooking()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    this.model = result;
-                    publishBooking();
-                }, error -> {
-                    this.error = error;
-                    publishBooking();
-                });
     }
 
     @Override
     protected void onDestroy() {
         eventBus.unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onTakeView(BookingActivity bookingActivity) {
+        super.onTakeView(bookingActivity);
+        if (bookingActivity.getIntent().hasExtra(BookingActivity.EXTRA_BOOKING_ID)) {
+            long bookingId = getView().getIntent().getLongExtra(BookingActivity.EXTRA_BOOKING_ID, -1);
+            bookingService.getBookingById(bookingId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        if (result.isPresent()) {
+                            this.model = result.get();
+                        } else {
+                            this.error = new RuntimeException("Die Buchung " + bookingId + " existiert nicht!");
+                        }
+                        publishBooking();
+                    }, error -> {
+                        this.error = error;
+                        publishBooking();
+                    });
+        } else {
+            bookingService.createNewBooking()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        this.model = result;
+                        publishBooking();
+                    }, error -> {
+                        this.error = error;
+                        publishBooking();
+                    });
+        }
     }
 
     public BookingEntity getModel() {

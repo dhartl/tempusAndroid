@@ -7,4 +7,6 @@
     <string name="project_subheading">Projekt</string>
     <string name="start_datetime_subheading">Start</string>
     <string name="end_datetime_subheading">Ende</string>
+    <string name="activity_booking_edit">Buchung bearbeiten</string>
+    <string name="activity_booking_new">Neue Buchung</string>
 </resources>

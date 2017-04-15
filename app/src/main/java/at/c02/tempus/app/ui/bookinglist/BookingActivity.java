@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,6 +36,11 @@ import nucleus.view.NucleusAppCompatActivity;
 @RequiresPresenter(BookingActivityPresenter.class)
 public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPresenter> {
 
+    public static final String EXTRA_BOOKING_ID = "EXTRA_BOOKING_ID";
+
+    @BindView(R.id.toolbar)
+    protected Toolbar toolbar;
+
     @BindView(R.id.cbProject)
     protected Spinner cbProject;
 
@@ -58,6 +64,8 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
         setContentView(R.layout.activity_booking);
         ButterKnife.bind(this);
 
+        setSupportActionBar(toolbar);
+
         adapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item);
         cbProject.setAdapter(adapter);
         cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -72,6 +80,12 @@ public class BookingActivity extends NucleusAppCompatActivity<BookingActivityPre
             }
         });
 
+
+        if (getIntent().hasExtra(EXTRA_BOOKING_ID)) {
+            setTitle(R.string.activity_booking_edit);
+        } else {
+            setTitle(R.string.activity_booking_new);
+        }
     }
 
     @OnClick(R.id.btnDateStart)
