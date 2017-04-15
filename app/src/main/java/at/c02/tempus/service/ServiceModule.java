@@ -1,24 +1,15 @@
 package at.c02.tempus.service;
 
-import android.util.EventLog;
-
-import com.google.gson.annotations.SerializedName;
-
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.EventBusBuilder;
 
 import javax.inject.Singleton;
 
 import at.c02.tempus.api.api.BookingApi;
 import at.c02.tempus.api.api.EmployeeApi;
 import at.c02.tempus.api.api.ProjectApi;
-import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.db.repository.BookingRepository;
 import at.c02.tempus.db.repository.EmployeeRepository;
 import at.c02.tempus.db.repository.ProjectRepository;
-import at.c02.tempus.service.BookingService;
-import at.c02.tempus.service.EmployeeService;
-import at.c02.tempus.service.ProjectService;
 import dagger.Module;
 import dagger.Provides;
 
@@ -36,8 +27,8 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public EmployeeService provideEmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository) {
-        return new EmployeeService(employeeApi, employeeRepository);
+    public EmployeeService provideEmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository, EventBus eventBus) {
+        return new EmployeeService(employeeApi, employeeRepository, eventBus);
     }
 
     @Provides
@@ -48,8 +39,8 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public SyncService provideSnycService(ProjectService projectService) {
-        return new SyncService(projectService);
+    public SyncService provideSnycService(ProjectService projectService, EmployeeService employeeService) {
+        return new SyncService(projectService, employeeService);
     }
 
     @Provides

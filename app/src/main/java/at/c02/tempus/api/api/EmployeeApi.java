@@ -16,7 +16,7 @@ public interface EmployeeApi {
    */
   
   @GET("api/Employee/{userName}")
-  Observable<Employee> apiEmployeeByUserNameGet(
+  Observable<Employee> findEmployeeByUserName(
     @retrofit2.http.Path("userName") String userName
   );
 

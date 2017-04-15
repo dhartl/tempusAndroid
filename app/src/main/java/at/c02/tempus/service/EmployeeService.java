@@ -1,18 +1,112 @@
 package at.c02.tempus.service;
 
+import android.util.EventLog;
+import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
 import at.c02.tempus.api.api.EmployeeApi;
+import at.c02.tempus.api.model.Employee;
+import at.c02.tempus.db.entity.EmployeeEntity;
+import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.db.repository.EmployeeRepository;
+import at.c02.tempus.service.event.EmployeeChangedEvent;
+import at.c02.tempus.service.event.ProjectsChangedEvent;
+import at.c02.tempus.service.sync.SyncResult;
+import at.c02.tempus.service.sync.SyncStatusFinder;
+import io.reactivex.Observable;
 
 /**
  * Created by Daniel on 09.04.2017.
  */
 
 public class EmployeeService {
+    private static final String TAG = "EmployeeService";
+
+    private static final String CURRENT_USER = "hHUber";
+
     private EmployeeApi employeeApi;
     private EmployeeRepository employeeRepository;
+    private EventBus eventBus;
 
-    public EmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository) {
+    private SyncStatusFinder<EmployeeEntity> syncStatusFinder = new SyncStatusFinder<>(EmployeeEntity::getExternalId,
+            (source, target) -> !(Objects.equals(source.getFirstName(), target.getFirstName()) &&
+                    Objects.equals(source.getLastName(), target.getLastName())));
+
+    public EmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository, EventBus eventBus) {
         this.employeeApi = employeeApi;
         this.employeeRepository = employeeRepository;
+        this.eventBus = eventBus;
+    }
+
+    public void loadEmployee() {
+        employeeApi.findEmployeeByUserName(CURRENT_USER).map(this::convertEmployeeToEntity)
+                .map(employee -> {
+                    List<EmployeeEntity> targetEmployee = employeeRepository.loadAll();
+                    Log.d(TAG, "Syncronisiere Employee: " + targetEmployee.size() + ", externer Employee: "
+                            + employee);
+
+                    return syncStatusFinder.findSyncStatus(
+                            Collections.singletonList(employee),
+                            targetEmployee);
+                })
+                .subscribe(syncResults -> {
+                    boolean emitChangedEvent = false;
+                    for (SyncResult<EmployeeEntity> syncResult : syncResults) {
+                        try {
+                            emitChangedEvent |= applySyncResult(syncResult);
+                        } catch (Exception ex) {
+                            Log.e(TAG, "Fehler bei der Synchronisation von Projekten; " + syncResult, ex);
+                        }
+                    }
+                    Log.d(TAG, "Projekt Synchronisation abgeschlossen");
+                    if (emitChangedEvent) {
+                        eventBus.post(new EmployeeChangedEvent(employeeRepository.findByUserName(CURRENT_USER)));
+                    }
+                }, throwable -> Log.e(TAG, "Fehler bei der Projektsynchronisation", throwable));
+    }
+
+    public Observable<EmployeeEntity> getCurrentEmployee() {
+        return Observable.fromCallable(() -> employeeRepository.findByUserName(CURRENT_USER));
+    }
+
+    private EmployeeEntity convertEmployeeToEntity(Employee employee) {
+        EmployeeEntity entity = new EmployeeEntity();
+        entity.setExternalId(Long.valueOf(employee.getEmployeeId()));
+        entity.setUserName(employee.getUserName());
+        entity.setFirstName(employee.getFirstName());
+        entity.setLastName(employee.getLastName());
+        return entity;
+    }
+
+    private boolean applySyncResult(SyncResult<EmployeeEntity> syncResult) {
+        boolean changed = false;
+        EmployeeEntity source = syncResult.getSource();
+        EmployeeEntity target = syncResult.getTarget();
+        switch (syncResult.getItemChange()) {
+            case CREATED:
+            case UPDATED: {
+                changed = true;
+                if (target != null) {
+                    source.setId(target.getId());
+                }
+                employeeRepository.createOrUpdate(source);
+                break;
+            }
+            case DELETED: {
+                changed = true;
+                employeeRepository.delete(target);
+                break;
+            }
+            case NOT_CHANGED:
+                //nichts tun
+                break;
+        }
+        return changed;
     }
 }

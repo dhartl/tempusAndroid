@@ -76,5 +76,14 @@ public class EmployeeEntity {
         this.lastName = lastName;
     }
 
-
+    @Override
+    public String toString() {
+        return "EmployeeEntity{" +
+                "id=" + id +
+                ", externalId=" + externalId +
+                ", userName='" + userName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
 }
