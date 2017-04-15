@@ -7,7 +7,6 @@ import com.fernandocejas.arrow.optional.Optional;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +26,7 @@ import at.c02.tempus.service.mapping.MappingUtils;
 import at.c02.tempus.service.sync.ItemChange;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
+import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
 /**
@@ -163,8 +163,8 @@ public class BookingService {
                 MappingUtils.fromLong(employeeService.getCurrentEmployee().blockingFirst().getExternalId()),
                 at.c02.tempus.utils.DateUtils.formatQueryDate(
                         at.c02.tempus.utils.DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
-                true
-        ).map(this::mapBookingsToEntity)
+                true)
+                .map(bookings -> CollectionUtils.convertList(bookings, BookingMapping::toBookingEntity))
                 .map(sourceBookings -> {
                     List<BookingEntity> targetBookings = bookingRepository.findServerBookings();
                     Log.d(TAG, "Syncronisiere Bookings: " + targetBookings.size() + ", externe Bookings: "
@@ -173,7 +173,8 @@ public class BookingService {
                     return syncStatusFinder.findSyncStatus(
                             sourceBookings,
                             targetBookings);
-                }).map(syncResults -> {
+                })
+                .map(syncResults -> {
                     boolean emitChangedEvent = false;
                     for (SyncResult<BookingEntity> syncResult : syncResults) {
                         try {
@@ -190,23 +191,9 @@ public class BookingService {
                 });
     }
 
-    private List<BookingEntity> mapBookingsToEntity(List<Booking> bookings) {
-        List<BookingEntity> entities = new ArrayList<>();
-        for (Booking booking : bookings) {
-            entities.add(BookingMapping.toBookingEntity(booking));
-        }
-        return entities;
-    }
-
     private Observable<Boolean> syncBookingsToServer() {
         return Observable.fromCallable(() -> bookingRepository.findModifiedEntries())
-                .map(bookingEntities -> {
-                    List<SyncResult> results = new ArrayList<>();
-                    for (BookingEntity booking : bookingEntities) {
-                        results.add(publishBooking(booking));
-                    }
-                    return results;
-                })
+                .map(bookingEntities -> CollectionUtils.convertList(bookingEntities, this::publishBooking))
                 .map(syncResults -> {
                     boolean emitChangedEvent = false;
                     for (SyncResult<BookingEntity> syncResult : syncResults) {
@@ -248,7 +235,7 @@ public class BookingService {
                 syncResult.setItemChange(ItemChange.NOT_CHANGED);
                 break;
         }
-        if(newBooking != null) {
+        if (newBooking != null) {
             syncResult.setSource(BookingMapping.toBookingEntity(newBooking));
         }
         return syncResult;

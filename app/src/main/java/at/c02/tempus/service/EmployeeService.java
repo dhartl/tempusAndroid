@@ -1,22 +1,18 @@
 package at.c02.tempus.service;
 
-import android.util.EventLog;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import at.c02.tempus.api.api.EmployeeApi;
-import at.c02.tempus.api.model.Employee;
 import at.c02.tempus.db.entity.EmployeeEntity;
-import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.db.repository.EmployeeRepository;
 import at.c02.tempus.service.event.EmployeeChangedEvent;
-import at.c02.tempus.service.event.ProjectsChangedEvent;
+import at.c02.tempus.service.mapping.EmployeeMapping;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
 import io.reactivex.Observable;
@@ -45,7 +41,7 @@ public class EmployeeService {
     }
 
     public void loadEmployee() {
-        employeeApi.findEmployeeByUserName(CURRENT_USER).map(this::convertEmployeeToEntity)
+        employeeApi.findEmployeeByUserName(CURRENT_USER).map(EmployeeMapping::toEmployeeEntity)
                 .map(employee -> {
                     List<EmployeeEntity> targetEmployee = employeeRepository.loadAll();
                     Log.d(TAG, "Syncronisiere Employee: " + targetEmployee.size() + ", externer Employee: "
@@ -77,15 +73,6 @@ public class EmployeeService {
             Log.d(TAG, "current employee: " + currentUser);
             return currentUser;
         });
-    }
-
-    private EmployeeEntity convertEmployeeToEntity(Employee employee) {
-        EmployeeEntity entity = new EmployeeEntity();
-        entity.setExternalId(Long.valueOf(employee.getEmployeeId()));
-        entity.setUserName(employee.getUserName());
-        entity.setFirstName(employee.getFirstName());
-        entity.setLastName(employee.getLastName());
-        return entity;
     }
 
     private boolean applySyncResult(SyncResult<EmployeeEntity> syncResult) {

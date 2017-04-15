@@ -6,18 +6,17 @@ import com.fernandocejas.arrow.optional.Optional;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import at.c02.tempus.api.api.ProjectApi;
-import at.c02.tempus.api.model.Project;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.db.repository.ProjectRepository;
 import at.c02.tempus.service.event.ProjectsChangedEvent;
+import at.c02.tempus.service.mapping.ProjectMapping;
 import at.c02.tempus.service.sync.SyncResult;
 import at.c02.tempus.service.sync.SyncStatusFinder;
-import io.reactivex.Flowable;
+import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
 /**
@@ -47,7 +46,8 @@ public class ProjectService {
     }
 
     public void loadProjects() {
-        projectApi.loadProjects().map(this::convertAllProjectsToEntities)
+        projectApi.loadProjects()
+                .map(projects -> CollectionUtils.convertList(projects, ProjectMapping::toProjectEntity))
                 .map(apiProjectEntities -> {
                     List<ProjectEntity> projectEntities = projectRepository.loadProjects();
                     Log.d(TAG, "Syncronisiere Projekte: " + apiProjectEntities.size() + " externe Projekte, "
@@ -97,21 +97,8 @@ public class ProjectService {
     }
 
     public Observable<Optional<ProjectEntity>> getDefaultProject() {
-        return Observable.fromCallable(()-> Optional.fromNullable(projectRepository.findDefaultProject()));
+        return Observable.fromCallable(() -> Optional.fromNullable(projectRepository.findDefaultProject()));
     }
 
-    private List<ProjectEntity> convertAllProjectsToEntities(List<Project> projects) {
-        List<ProjectEntity> entities = new ArrayList<>();
-        for (Project project : projects) {
-            entities.add(convertProjectToEntity(project));
-        }
-        return entities;
-    }
 
-    private ProjectEntity convertProjectToEntity(Project project) {
-        ProjectEntity entity = new ProjectEntity();
-        entity.setExternalId(Long.valueOf(project.getProjectId()));
-        entity.setName(project.getProjectName());
-        return entity;
-    }
 }
