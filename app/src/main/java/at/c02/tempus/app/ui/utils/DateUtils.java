@@ -75,4 +75,10 @@ public class DateUtils {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
     }
+
+    public static Date getDateBefore(int time, int timeUnit) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(timeUnit, (-1) * time);
+        return calendar.getTime();
+    }
 }
