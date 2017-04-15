@@ -10,7 +10,9 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import at.c02.tempus.api.api.BookingApi;
 import at.c02.tempus.api.model.Booking;
@@ -23,10 +25,10 @@ import at.c02.tempus.service.event.BookingChangedEvent;
 import at.c02.tempus.service.event.BookingsChangedEvent;
 import at.c02.tempus.service.mapping.BookingMapping;
 import at.c02.tempus.service.mapping.MappingUtils;
-import at.c02.tempus.service.sync.ItemChange;
-import at.c02.tempus.service.sync.SyncResult;
-import at.c02.tempus.service.sync.SyncStatusFinder;
-import at.c02.tempus.service.sync.UpdateDetectorFactory;
+import at.c02.tempus.service.sync.status.ItemChange;
+import at.c02.tempus.service.sync.status.SyncResult;
+import at.c02.tempus.service.sync.status.SyncStatusFinder;
+import at.c02.tempus.service.sync.status.UpdateDetectorFactory;
 import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
@@ -34,31 +36,24 @@ import io.reactivex.Observable;
  * Created by Daniel on 09.04.2017.
  */
 
+@Singleton
 public class BookingService {
     private static final String TAG = "BookingService";
 
-    private BookingApi bookingApi;
-    private BookingRepository bookingRepository;
-    private EventBus eventBus;
-    private EmployeeService employeeService;
-    private ProjectService projectService;
+    @Inject
+    protected BookingRepository bookingRepository;
 
-    private SyncStatusFinder<BookingEntity> syncStatusFinder = new SyncStatusFinder<>(item -> item.getExternalId(),
-            UpdateDetectorFactory.create(BookingEntity::getEmployeeId,
-                    BookingEntity::getProjectId,
-                    BookingEntity::getBeginDate,
-                    BookingEntity::getEndDate));
+    @Inject
+    protected EventBus eventBus;
 
-    public BookingService(BookingApi bookingApi,
-                          BookingRepository bookingRepository,
-                          EventBus eventBus,
-                          EmployeeService employeeService,
-                          ProjectService projectService) {
-        this.bookingApi = bookingApi;
-        this.bookingRepository = bookingRepository;
-        this.eventBus = eventBus;
-        this.employeeService = employeeService;
-        this.projectService = projectService;
+    @Inject
+    protected EmployeeService employeeService;
+
+    @Inject
+    protected ProjectService projectService;
+
+    @Inject
+    public BookingService() {
     }
 
     public BookingEntity createOrUpdateBooking(BookingEntity booking) {
@@ -147,125 +142,5 @@ public class BookingService {
         return Observable.fromCallable(() -> Optional.fromNullable(bookingRepository.findBookingById(id)));
     }
 
-    public void synchronizeBookings() {
-        Observable<Boolean> bookingsToServer = syncBookingsToServer();
-        Observable<Boolean> bookingsFromServer = syncBookingsFromServer();
 
-        Observable.concat(bookingsToServer, bookingsFromServer).subscribe(result -> {
-                }, error -> Log.e(TAG, "Fehler bei der Synchronisation von Buchungen", error)
-        );
-
-    }
-
-    private Observable<Boolean> syncBookingsFromServer() {
-        Log.d(TAG, "Sending Bookings to Server");
-        return bookingApi.findBookingsForEmployeeAndDate(
-                //FIXME: Buchungssynchronisation darf erst nach Employee-Synchronisation laufen!
-                MappingUtils.fromLong(employeeService.getCurrentEmployee().blockingFirst().getExternalId()),
-                at.c02.tempus.utils.DateUtils.formatQueryDate(
-                        at.c02.tempus.utils.DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
-                true)
-                .map(bookings -> CollectionUtils.convertList(bookings, BookingMapping::toBookingEntity))
-                .map(sourceBookings -> {
-                    List<BookingEntity> targetBookings = bookingRepository.findServerBookings();
-                    Log.d(TAG, "Syncronisiere Bookings: " + targetBookings.size() + ", externe Bookings: "
-                            + sourceBookings.size());
-
-                    return syncStatusFinder.findSyncStatus(
-                            sourceBookings,
-                            targetBookings);
-                })
-                .map(syncResults -> {
-                    boolean emitChangedEvent = false;
-                    for (SyncResult<BookingEntity> syncResult : syncResults) {
-                        try {
-                            emitChangedEvent |= applySyncResult(syncResult);
-                        } catch (Exception ex) {
-                            Log.e(TAG, "Fehler bei der Synchronisation von Bookings; " + syncResult, ex);
-                        }
-                    }
-                    Log.d(TAG, "Bookings Synchronisation abgeschlossen");
-                    if (emitChangedEvent) {
-                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
-                    }
-                    return emitChangedEvent;
-                });
-    }
-
-    private Observable<Boolean> syncBookingsToServer() {
-        return Observable.fromCallable(() -> bookingRepository.findModifiedEntries())
-                .map(bookingEntities -> CollectionUtils.convertList(bookingEntities, this::publishBooking))
-                .map(syncResults -> {
-                    boolean emitChangedEvent = false;
-                    for (SyncResult<BookingEntity> syncResult : syncResults) {
-                        try {
-                            emitChangedEvent |= applySyncResult(syncResult);
-                        } catch (Exception ex) {
-                            Log.e(TAG, "Fehler beim Publishen von Bookings; " + syncResult, ex);
-                        }
-                    }
-                    Log.d(TAG, "Bookings Publishing abgeschlossen");
-                    if (emitChangedEvent) {
-                        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
-                    }
-                    return emitChangedEvent;
-                });
-    }
-
-    private SyncResult<BookingEntity> publishBooking(BookingEntity bookingEntity) {
-        SyncResult<BookingEntity> syncResult = new SyncResult<>();
-        syncResult.setTarget(bookingEntity);
-        Booking booking = BookingMapping.fromBookingEntity(bookingEntity);
-        Booking newBooking = null;
-        switch (bookingEntity.getSyncStatus()) {
-            case NEW:
-                newBooking = bookingApi.createBooking(booking).blockingFirst();
-                syncResult.setItemChange(ItemChange.UPDATED);
-                break;
-            case MODIFIED:
-                newBooking = bookingApi.updateBooking(booking).blockingFirst();
-                syncResult.setItemChange(ItemChange.UPDATED);
-                break;
-            case DELETED:
-                bookingApi.deleteBooking(booking.getBookingId()).blockingAwait();
-                syncResult.setItemChange(ItemChange.DELETED);
-                break;
-            case SYNCED:
-            case UNKNOWN:
-                // Keine Aktion notwendig
-                syncResult.setItemChange(ItemChange.NOT_CHANGED);
-                break;
-        }
-        if (newBooking != null) {
-            syncResult.setSource(BookingMapping.toBookingEntity(newBooking));
-        }
-        return syncResult;
-    }
-
-    private boolean applySyncResult(SyncResult<BookingEntity> syncResult) {
-        boolean changed = false;
-        BookingEntity source = syncResult.getSource();
-        BookingEntity target = syncResult.getTarget();
-        switch (syncResult.getItemChange()) {
-            case CREATED:
-            case UPDATED: {
-                changed = true;
-                if (target != null) {
-                    source.setId(target.getId());
-                    source.setSyncStatus(EntityStatus.SYNCED);
-                }
-                bookingRepository.createOrUpdate(source);
-                break;
-            }
-            case DELETED: {
-                changed = true;
-                bookingRepository.delete(target);
-                break;
-            }
-            case NOT_CHANGED:
-                //nichts tun
-                break;
-        }
-        return changed;
-    }
 }

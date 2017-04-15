@@ -1,4 +1,4 @@
-package at.c02.tempus.service.sync;
+package at.c02.tempus.service.sync.status;
 
 import java.util.ArrayList;
 import java.util.HashMap;

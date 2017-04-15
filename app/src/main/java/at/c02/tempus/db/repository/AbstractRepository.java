@@ -10,7 +10,7 @@ import at.c02.tempus.db.entity.BookingEntity;
  * Created by Daniel Hartl on 15.04.2017.
  */
 
-public class AbstractRepository<E, K, T extends AbstractDao<E, K>> {
+public abstract class AbstractRepository<E, K, T extends AbstractDao<E, K>> {
 
     protected T dao;
 

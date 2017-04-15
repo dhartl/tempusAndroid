@@ -1,17 +1,16 @@
-package at.c02.tempus.at.c02.tempus.service.sync;
+package at.c02.tempus.at.c02.tempus.service.sync.status;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import at.c02.tempus.service.sync.ItemChange;
-import at.c02.tempus.service.sync.SyncResult;
-import at.c02.tempus.service.sync.SyncStatusFinder;
+import at.c02.tempus.service.sync.status.ItemChange;
+import at.c02.tempus.service.sync.status.SyncResult;
+import at.c02.tempus.service.sync.status.SyncStatusFinder;
 
 /**
  * Created by Daniel Hartl on 14.04.2017.

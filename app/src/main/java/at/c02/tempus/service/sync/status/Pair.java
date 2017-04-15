@@ -1,4 +1,4 @@
-package at.c02.tempus.service.sync;
+package at.c02.tempus.service.sync.status;
 
 /**
  * Created by Daniel Hartl on 14.04.2017.

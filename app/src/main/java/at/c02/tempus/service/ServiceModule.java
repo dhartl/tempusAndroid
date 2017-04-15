@@ -10,6 +10,11 @@ import at.c02.tempus.api.api.ProjectApi;
 import at.c02.tempus.db.repository.BookingRepository;
 import at.c02.tempus.db.repository.EmployeeRepository;
 import at.c02.tempus.db.repository.ProjectRepository;
+import at.c02.tempus.service.sync.BookingFromServerSyncService;
+import at.c02.tempus.service.sync.BookingToServerSyncService;
+import at.c02.tempus.service.sync.EmployeeSyncService;
+import at.c02.tempus.service.sync.ProjectSyncService;
+import at.c02.tempus.service.sync.SyncServiceModule;
 import dagger.Module;
 import dagger.Provides;
 
@@ -21,33 +26,16 @@ public class ServiceModule {
 
     @Provides
     @Singleton
-    public BookingService provideBookingService(BookingApi bookingApi,
-                                                BookingRepository bookingRepository,
-                                                EventBus eventBus,
-                                                EmployeeService employeeService,
-                                                ProjectService projectService) {
-        return new BookingService(bookingApi, bookingRepository, eventBus, employeeService, projectService);
-    }
-
-    @Provides
-    @Singleton
-    public EmployeeService provideEmployeeService(EmployeeApi employeeApi, EmployeeRepository employeeRepository, EventBus eventBus) {
-        return new EmployeeService(employeeApi, employeeRepository, eventBus);
-    }
-
-    @Provides
-    @Singleton
-    public ProjectService provideProjectService(ProjectApi projectApi, ProjectRepository projectRepository, EventBus eventBus) {
-        return new ProjectService(projectApi, projectRepository, eventBus);
-    }
-
-    @Provides
-    @Singleton
-    public SyncService provideSnycService(ProjectService projectService,
-                                          EmployeeService employeeService,
-                                          BookingService bookingService,
-                                          EventBus eventBus) {
-        return new SyncService(projectService, employeeService, bookingService, eventBus);
+    public SyncService provideSyncService(EventBus eventBus,
+                                          BookingFromServerSyncService bookingFromServerSyncService,
+                                          BookingToServerSyncService bookingToServerSyncService,
+                                          EmployeeSyncService employeeSyncService,
+                                          ProjectSyncService projectSyncService) {
+        return new SyncService(eventBus,
+                bookingFromServerSyncService,
+                bookingToServerSyncService,
+                employeeSyncService,
+                projectSyncService);
     }
 
     @Provides
