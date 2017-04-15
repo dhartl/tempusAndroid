@@ -94,6 +94,7 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
 
     compile 'eu.davidea:flexible-adapter:5.0.0-rc1'
+    compile 'com.fernandocejas:arrow:1.0.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-junit:1.0.0.1'
