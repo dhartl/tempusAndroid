@@ -36,7 +36,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiClient {
 
-    public static final String BASE_URL = "http://10.0.2.2:5000/";
+    // 10.0.2.2 ist ip von Localhost für den Emulator
+    // Wenn Handy verwendet wird, dann muss hier die Ip des PCs eingetragen werden!
+    public static final String BASE_URL = "http://10.0.2.2:5001/";
 
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder;

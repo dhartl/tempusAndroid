@@ -28,7 +28,7 @@ import io.reactivex.Observable;
 public class EmployeeService {
     private static final String TAG = "EmployeeService";
 
-    public static final String CURRENT_USER = "hHUber";
+    public static final String CURRENT_USER = "ckelley0";
 
     @Inject
     protected EmployeeRepository employeeRepository;
