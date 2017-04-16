@@ -7,6 +7,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -19,6 +22,9 @@ import at.c02.tempus.service.sync.BookingToServerSyncService;
 import at.c02.tempus.service.sync.EmployeeSyncService;
 import at.c02.tempus.service.sync.ProjectSyncService;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Daniel Hartl on 14.04.2017.
@@ -61,23 +67,28 @@ public class SyncService {
     public void synchronize() {
         Log.d(TAG, "Sync started");
         Observable.concat(
-                employeeSyncService.syncronize(),
-                projectSyncService.syncronize(),
-                synchronizeBookings())
+                employeeSyncService.syncronize()
+                        .flatMap(result -> synchronizeBookings()),
+                projectSyncService.syncronize())
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .doOnError(error -> Log.e(TAG, "Fehler bei der Synchronisation", error))
                 .subscribe();
 
     }
 
     public Observable<Boolean> synchronizeBookings() {
         Log.d(TAG, "Sync of Bookings started");
-        return Observable.concat(
-                bookingToServerSyncService.syncronize(),
-                bookingFromServerSyncService.syncronize());
+        return bookingToServerSyncService.syncronize()
+                .flatMap(result -> bookingFromServerSyncService.syncronize());
     }
 
     @Subscribe
     public void onBookingChangedEvent(BookingChangedEvent booking) {
-        Log.d(TAG, "Sync of Bookings started");
-        synchronizeBookings().subscribe();
+        synchronizeBookings()
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .doOnError(error -> Log.e(TAG, "Fehler bei der Synchronisation", error))
+                .subscribe();
     }
 }

@@ -31,24 +31,13 @@ import io.reactivex.Observable;
  */
 
 @Singleton
-public class BookingFromServerSyncService extends AbstractSyncService<BookingEntity> {
+public class BookingFromServerSyncService extends AbstractBookingSyncService {
 
-    @Inject
-    protected BookingApi bookingApi;
-    @Inject
-    protected BookingRepository bookingRepository;
-    @Inject
-    protected EventBus eventBus;
     @Inject
     protected EmployeeService employeeService;
 
     @Inject
     public BookingFromServerSyncService() {
-        super(new SyncStatusFinder<>(item -> item.getExternalId(),
-                UpdateDetectorFactory.create(BookingEntity::getEmployeeId,
-                        BookingEntity::getProjectId,
-                        BookingEntity::getBeginDate,
-                        BookingEntity::getEndDate)));
     }
 
     @Override
@@ -74,22 +63,4 @@ public class BookingFromServerSyncService extends AbstractSyncService<BookingEnt
         return bookingRepository.findServerBookings();
     }
 
-    @Override
-    protected void publishResults() {
-        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
-    }
-
-    @Override
-    protected void createOrUpdate(BookingEntity source, BookingEntity target) {
-        if (target != null) {
-            source.setId(target.getId());
-            source.setSyncStatus(EntityStatus.SYNCED);
-        }
-        bookingRepository.createOrUpdate(source);
-    }
-
-    @Override
-    protected void delete(BookingEntity target) {
-        bookingRepository.delete(target);
-    }
 }

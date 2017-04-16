@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import at.c02.tempus.api.api.BookingApi;
 import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.db.entity.BookingEntity;
+import at.c02.tempus.db.entity.EntityStatus;
 import at.c02.tempus.db.repository.BookingRepository;
 import at.c02.tempus.service.EmployeeService;
 import at.c02.tempus.service.event.BookingsChangedEvent;
@@ -25,17 +26,10 @@ import io.reactivex.Observable;
  */
 
 @Singleton
-public class BookingToServerSyncService extends AbstractSyncService<BookingEntity> {
-    @Inject
-    protected BookingApi bookingApi;
-    @Inject
-    protected BookingRepository bookingRepository;
-    @Inject
-    protected EventBus eventBus;
+public class BookingToServerSyncService extends AbstractBookingSyncService {
 
     @Inject
     public BookingToServerSyncService() {
-        super(null /* not needed */);
     }
 
     @Override
@@ -48,11 +42,6 @@ public class BookingToServerSyncService extends AbstractSyncService<BookingEntit
         return Observable.fromCallable(() -> bookingRepository.findModifiedEntries());
     }
 
-
-    @Override
-    protected void publishResults() {
-        eventBus.post(new BookingsChangedEvent(bookingRepository.loadAllDeep()));
-    }
 
     @Override
     protected List<SyncResult<BookingEntity>> createSyncStatus(List<BookingEntity> legacyItems) {
@@ -95,13 +84,5 @@ public class BookingToServerSyncService extends AbstractSyncService<BookingEntit
         return null;
     }
 
-    @Override
-    protected void createOrUpdate(BookingEntity source, BookingEntity target) {
-        // not needed
-    }
 
-    @Override
-    protected void delete(BookingEntity target) {
-        // not needed
-    }
 }

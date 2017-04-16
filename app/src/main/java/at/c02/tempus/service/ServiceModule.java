@@ -4,17 +4,10 @@ import org.greenrobot.eventbus.EventBus;
 
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.api.BookingApi;
-import at.c02.tempus.api.api.EmployeeApi;
-import at.c02.tempus.api.api.ProjectApi;
-import at.c02.tempus.db.repository.BookingRepository;
-import at.c02.tempus.db.repository.EmployeeRepository;
-import at.c02.tempus.db.repository.ProjectRepository;
 import at.c02.tempus.service.sync.BookingFromServerSyncService;
 import at.c02.tempus.service.sync.BookingToServerSyncService;
 import at.c02.tempus.service.sync.EmployeeSyncService;
 import at.c02.tempus.service.sync.ProjectSyncService;
-import at.c02.tempus.service.sync.SyncServiceModule;
 import dagger.Module;
 import dagger.Provides;
 

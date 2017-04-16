@@ -30,7 +30,12 @@ public abstract class AbstractSyncService<T> {
     protected abstract String getName();
 
     public Observable<Boolean> syncronize() {
+        Log.d(TAG, String.format("%s: sync started", getName()));
         return loadLegacyItems()
+                .map(items -> {
+                    Log.d(TAG, String.format("%s: started evaluation", getName()));
+                    return items;
+                })
                 .map(this::createSyncStatus)
                 .map(syncResults -> {
                     boolean itemChanged = false;
@@ -72,11 +77,13 @@ public abstract class AbstractSyncService<T> {
         switch (syncResult.getItemChange()) {
             case CREATED:
             case UPDATED: {
+                Log.d(TAG,String.format("%s: create or update %s",getName(), syncResult));
                 changed = true;
                 createOrUpdate(source, target);
                 break;
             }
             case DELETED: {
+                Log.d(TAG,String.format("%s: delete %s",getName(), syncResult));
                 delete(target);
                 break;
             }
