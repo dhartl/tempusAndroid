@@ -5,6 +5,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import at.c02.tempus.R;
 
@@ -47,4 +49,23 @@ public class MainActivity extends NucleusAppCompatActivity<MainActivityPresenter
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.miSync: {
+                getPresenter().startSync();
+                return true;
+            }
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

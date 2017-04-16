@@ -30,4 +30,8 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
         super.onCreate(savedState);
         syncService.synchronize();
     }
+
+    public void startSync() {
+        syncService.synchronize();
+    }
 }

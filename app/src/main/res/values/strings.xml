@@ -10,4 +10,5 @@
     <string name="activity_booking_edit">Buchung bearbeiten</string>
     <string name="activity_booking_new">Neue Buchung</string>
     <string name="delete">Löschen</string>
+    <string name="sync">Synchronisieren</string>
 </resources>

@@ -50,6 +50,7 @@ public abstract class AbstractSyncService<T> {
                     Log.d(TAG, String.format("%s: Finished applying sync", getName()));
                     return itemChanged;
                 }).map(itemChanged -> {
+                    Log.d(TAG, String.format("%s: HasChangesToPublish: %s", getName(), itemChanged));
                     if (itemChanged) {
                         publishResults();
                     }
@@ -84,6 +85,7 @@ public abstract class AbstractSyncService<T> {
             }
             case DELETED: {
                 Log.d(TAG,String.format("%s: delete %s",getName(), syncResult));
+                changed = true;
                 delete(target);
                 break;
             }
