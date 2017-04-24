@@ -46,4 +46,7 @@ public class ProjectService {
     }
 
 
+    public Observable<ProjectEntity> findProjectByExternalId(Long externalProjectId) {
+        return Observable.fromCallable(() -> projectRepository.findByExternalId(externalProjectId));
+    }
 }

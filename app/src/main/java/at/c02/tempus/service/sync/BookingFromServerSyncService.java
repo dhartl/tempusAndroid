@@ -34,9 +34,6 @@ import io.reactivex.Observable;
 public class BookingFromServerSyncService extends AbstractBookingSyncService {
 
     @Inject
-    protected EmployeeService employeeService;
-
-    @Inject
     public BookingFromServerSyncService() {
     }
 
@@ -55,7 +52,7 @@ public class BookingFromServerSyncService extends AbstractBookingSyncService {
                 DateUtils.formatQueryDate(
                         DateUtils.getDateBefore(7, Calendar.DAY_OF_MONTH)),
                 true
-        ).map(legacyBookings -> CollectionUtils.convertList(legacyBookings, BookingMapping::toBookingEntity));
+        ).map(legacyBookings -> CollectionUtils.convertList(legacyBookings, this::mapBookingToEntity));
     }
 
     @Override

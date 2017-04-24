@@ -73,7 +73,7 @@ public class BookingToServerSyncService extends AbstractBookingSyncService {
                 break;
         }
         if (newBooking != null) {
-            syncResult.setSource(BookingMapping.toBookingEntity(newBooking));
+            syncResult.setSource(mapBookingToEntity(newBooking));
         }
         return syncResult;
     }

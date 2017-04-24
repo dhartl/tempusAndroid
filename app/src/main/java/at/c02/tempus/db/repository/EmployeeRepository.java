@@ -13,7 +13,7 @@ import at.c02.tempus.db.entity.ProjectEntity;
  * Created by Daniel on 09.04.2017.
  */
 
-public class EmployeeRepository extends AbstractRepository<EmployeeEntity, Long, EmployeeEntityDao>{
+public class EmployeeRepository extends AbstractRepository<EmployeeEntity, Long, EmployeeEntityDao> {
 
 
     public EmployeeRepository(EmployeeEntityDao dao) {
@@ -23,6 +23,12 @@ public class EmployeeRepository extends AbstractRepository<EmployeeEntity, Long,
     public EmployeeEntity findByUserName(String userName) {
         return dao.queryBuilder()
                 .where(EmployeeEntityDao.Properties.UserName.like(userName))
+                .unique();
+    }
+
+    public EmployeeEntity findByExternalId(Long externalEmployeeId) {
+        return dao.queryBuilder()
+                .where(EmployeeEntityDao.Properties.ExternalId.eq(externalEmployeeId))
                 .unique();
     }
 }

@@ -43,4 +43,9 @@ public class EmployeeService {
         );
     }
 
+    public Observable<EmployeeEntity> findEmployeeByExternalId(Long externalEmployeeId) {
+        return Observable.fromCallable(
+                () -> employeeRepository.findByExternalId(externalEmployeeId)
+        );
+    }
 }

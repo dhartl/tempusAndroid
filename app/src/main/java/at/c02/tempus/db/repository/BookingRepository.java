@@ -1,17 +1,21 @@
 package at.c02.tempus.db.repository;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
+import at.c02.tempus.api.model.Employee;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.BookingEntityDao;
 import at.c02.tempus.db.entity.EmployeeEntity;
 import at.c02.tempus.db.entity.EntityStatus;
+import at.c02.tempus.db.entity.ProjectEntity;
 
 /**
  * Klasse für Queries auf Booking-Tabelle
  * Created by Daniel on 09.04.2017.
  */
-public class BookingRepository extends AbstractRepository<BookingEntity, Long, BookingEntityDao>{
+public class BookingRepository extends AbstractRepository<BookingEntity, Long, BookingEntityDao> {
 
     public BookingRepository(BookingEntityDao dao) {
         super(dao);
@@ -37,7 +41,10 @@ public class BookingRepository extends AbstractRepository<BookingEntity, Long, B
     }
 
     public List<BookingEntity> findModifiedEntries() {
-        return dao.queryBuilder()
+        QueryBuilder<BookingEntity> queryBuilder = dao.queryBuilder();
+        queryBuilder.join(BookingEntityDao.Properties.ProjectId, ProjectEntity.class);
+        queryBuilder.join(BookingEntityDao.Properties.EmployeeId, EmployeeEntity.class);
+        return queryBuilder
                 .where(BookingEntityDao.Properties.SyncStatus.in(
                         EntityStatus.DELETED.getId(),
                         EntityStatus.MODIFIED.getId(),
