@@ -64,10 +64,6 @@ dependencies {
     compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     compile "com.squareup.okhttp3:logging-interceptor:3.6.0"
     compile "io.swagger:swagger-annotations:$swagger_annotations_version"
-    compile ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2") {
-        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
-        exclude group: 'org.json', module: 'json'
-    }
 
     // Dependency Injection
     compile 'com.google.dagger:dagger:2.4'
