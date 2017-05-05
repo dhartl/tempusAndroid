@@ -72,8 +72,8 @@ public class SyncService {
                 projectSyncService.syncronize())
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
-                .doOnError(error -> Log.e(TAG, "Fehler bei der Synchronisation", error))
-                .subscribe();
+                .subscribe(result -> {
+                }, error -> Log.e(TAG, "Fehler bei der Synchronisation", error));
 
     }
 
@@ -88,7 +88,7 @@ public class SyncService {
         synchronizeBookings()
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
-                .doOnError(error -> Log.e(TAG, "Fehler bei der Synchronisation", error))
-                .subscribe();
+                .subscribe(result -> {
+                }, error -> Log.e(TAG, "Fehler bei der Synchronisation", error));
     }
 }
