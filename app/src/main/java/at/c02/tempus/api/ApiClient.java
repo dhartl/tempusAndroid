@@ -7,6 +7,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -15,7 +18,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-
+@Singleton
 public class ApiClient {
 
     // 10.0.2.2 ist ip von Localhost für den Emulator
@@ -26,7 +29,12 @@ public class ApiClient {
     private OkHttpClient.Builder okBuilder;
     private Retrofit.Builder adapterBuilder;
 
-    public ApiClient() {
+    protected AuthInterceptor authInterceptor;
+
+    @Inject
+    public ApiClient(AuthInterceptor authInterceptor) {
+
+        this.authInterceptor = authInterceptor;
         createDefaultAdapter();
     }
 
@@ -42,6 +50,7 @@ public class ApiClient {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         okBuilder.addInterceptor(logging);
+        okBuilder.addInterceptor(authInterceptor);
 
 
         adapterBuilder = new Retrofit
