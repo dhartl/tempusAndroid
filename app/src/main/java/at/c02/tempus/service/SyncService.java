@@ -1,7 +1,9 @@
 package at.c02.tempus.service;
 
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -64,16 +66,20 @@ public class SyncService {
         eventBus.register(this);
     }
 
-    public void synchronize() {
+    public void synchronize(Context context) {
         Log.d(TAG, "Sync started");
         Observable.concat(
                 employeeSyncService.syncronize()
                         .flatMap(result -> synchronizeBookings()),
                 projectSyncService.syncronize())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(result -> {
-                }, error -> Log.e(TAG, "Fehler bei der Synchronisation", error));
+                    Toast.makeText(context, "Synchronisation abgeschlossen", Toast.LENGTH_SHORT).show();
+                }, error -> {
+                    Toast.makeText(context, "Fehler bei der Synchronisation", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Fehler bei der Synchronisation", error);
+                });
 
     }
 

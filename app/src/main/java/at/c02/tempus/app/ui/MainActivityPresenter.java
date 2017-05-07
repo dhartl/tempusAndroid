@@ -7,7 +7,8 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
-import at.c02.tempus.db.repository.EmployeeRepository;
+import at.c02.tempus.db.entity.EmployeeEntity;
+import at.c02.tempus.service.EmployeeService;
 import at.c02.tempus.service.SyncService;
 import nucleus.presenter.Presenter;
 
@@ -20,6 +21,11 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
     @Inject
     protected SyncService syncService;
 
+    @Inject
+    protected EmployeeService employeeService;
+
+    private EmployeeEntity employeeEntity;
+
     public MainActivityPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
         Log.d("MainActivityPresenter", "MainActivityPresenter loaded");
@@ -28,10 +34,30 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
-        syncService.synchronize();
+
+    }
+
+    @Override
+    protected void onTakeView(MainActivity mainActivity) {
+        super.onTakeView(mainActivity);
+        syncService.synchronize(getView());
+        employeeService.getCurrentEmployee().subscribe(employeeEntity -> {
+            this.employeeEntity = employeeEntity;
+            publishEmployee();
+        });
     }
 
     public void startSync() {
-        syncService.synchronize();
+        syncService.synchronize(getView());
+    }
+
+    protected void publishEmployee() {
+        String userName = "";
+        if(employeeEntity == null) {
+            userName = "Benutzername";
+        }else {
+          userName = employeeEntity.getFirstName() +" "+employeeEntity.getLastName();
+        }
+        getView().setUserData(userName);
     }
 }
