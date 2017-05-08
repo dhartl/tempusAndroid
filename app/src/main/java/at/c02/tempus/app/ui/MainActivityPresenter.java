@@ -1,5 +1,6 @@
 package at.c02.tempus.app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
+import at.c02.tempus.auth.AuthService;
 import at.c02.tempus.db.entity.EmployeeEntity;
 import at.c02.tempus.service.EmployeeService;
 import at.c02.tempus.service.SyncService;
@@ -23,6 +25,9 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
 
     @Inject
     protected EmployeeService employeeService;
+
+    @Inject
+    protected AuthService authService;
 
     private EmployeeEntity employeeEntity;
 
@@ -53,11 +58,16 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
 
     protected void publishEmployee() {
         String userName = "";
-        if(employeeEntity == null) {
+        if (employeeEntity == null) {
             userName = "Benutzername";
-        }else {
-          userName = employeeEntity.getFirstName() +" "+employeeEntity.getLastName();
+        } else {
+            userName = employeeEntity.getFirstName() + " " + employeeEntity.getLastName();
         }
         getView().setUserData(userName);
+    }
+
+    public void logout() {
+        authService.logout(getView());
+        getView().finish();
     }
 }

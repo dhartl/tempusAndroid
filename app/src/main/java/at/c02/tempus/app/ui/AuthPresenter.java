@@ -43,9 +43,9 @@ public class AuthPresenter extends Presenter<AuthActivity> {
         io.reactivex.Observable.fromCallable(() -> {
             try {
                 AuthorizationService authorizationService = authService.getAuthorizationService(getView());
-                PendingIntent postAuthIntent = PendingIntent.getActivity(getView(), 0, new Intent(getView(), AuthActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
-                //PendingIntent.getActivity(getView(), 0, new Intent(getView(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent postAuthIntent = PendingIntent.getActivity(getView(), 0, new Intent(getView(), AuthActivity.class), PendingIntent.FLAG_ONE_SHOT);
                 authorizationService.performAuthorizationRequest(authService.getAuthorizationRequest(), postAuthIntent);
+                getView().finish();
             } catch (AuthException e) {
                 Log.e(TAG, "Fehler bei der Authentifizierung", e);
                 Toast.makeText(getView(), e.getMessage(), Toast.LENGTH_LONG);

@@ -2,9 +2,7 @@ package at.c02.tempus.auth;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.style.BulletSpan;
+import android.support.customtabs.CustomTabsIntent;
 import android.util.Log;
 
 import net.openid.appauth.AppAuthConfiguration;
@@ -16,10 +14,7 @@ import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ClientAuthentication;
 import net.openid.appauth.ClientSecretPost;
-import net.openid.appauth.RegistrationRequest;
-import net.openid.appauth.RegistrationResponse;
 import net.openid.appauth.ResponseTypeValues;
-import net.openid.appauth.TokenRequest;
 import net.openid.appauth.connectivity.ConnectionBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,15 +23,9 @@ import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Connection;
-import java.util.Arrays;
-
-import javax.inject.Inject;
-import javax.net.ssl.HttpsURLConnection;
 
 import at.c02.tempus.auth.events.AuthenticationEvent;
 import at.c02.tempus.auth.events.TokenEvent;
-import retrofit2.http.Url;
 
 /**
  * Created by Daniel Hartl on 04.05.2017.
@@ -144,7 +133,24 @@ public class AuthService {
     public void onTokenEvent(TokenEvent event) {
         if (event.getTokenResponse() != null || event.getAuthorizationException() != null) {
             authHolder.getAuthState().update(event.getTokenResponse(), event.getAuthorizationException());
-            Log.d(TAG, "Token: "+authHolder.getAuthToken());
+            Log.d(TAG, "Token: " + authHolder.getAuthToken());
         }
     }
+
+    public void logout(Context context) {
+        authHolder.setAuthState(null);
+        try {
+            String url = "http://10.0.2.2:5000/Account/Logout";
+
+            // Here is a method that returns the chrome package name
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.intent.setPackage("com.android.chrome");
+            customTabsIntent.launchUrl(context, Uri.parse(url));
+
+         } catch (Exception ex) {
+            Log.e(TAG, "Fehler beim revoken des Access-Tokens");
+        }
+    }
+
 }

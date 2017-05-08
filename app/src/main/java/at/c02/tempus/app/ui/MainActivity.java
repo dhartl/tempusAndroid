@@ -102,6 +102,7 @@ public class MainActivity extends NucleusAppCompatActivity<MainActivityPresenter
                     getPresenter().startSync();
                     break;
                 case R.id.nav_logout:
+                    getPresenter().logout();
                     break;
                 default:
             }
