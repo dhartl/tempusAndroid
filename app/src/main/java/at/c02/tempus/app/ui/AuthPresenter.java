@@ -2,6 +2,7 @@ package at.c02.tempus.app.ui;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.support.annotation.MainThread;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.auth.AuthException;
 import at.c02.tempus.auth.AuthHolder;
 import at.c02.tempus.auth.AuthService;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
@@ -36,48 +38,72 @@ public class AuthPresenter extends Presenter<AuthActivity> {
     @Inject
     protected EventBus eventBus;
 
+    private AuthorizationService authorizationService;
+
+    private String authMessage;
+    private boolean btnAuthenticateEnabled = true;
+
     public AuthPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
     }
 
     public void authenticate() {
-        io.reactivex.Observable.fromCallable(() -> {
-            try {
-                AuthorizationService authorizationService = authService.getAuthorizationService(getView());
-                PendingIntent postAuthIntent = PendingIntent.getActivity(getView(), 0, new Intent(getView(), AuthActivity.class), PendingIntent.FLAG_ONE_SHOT);
-                authorizationService.performAuthorizationRequest(authService.getAuthorizationRequest(), postAuthIntent);
-                getView().finish();
-            } catch (AuthException e) {
-                Log.e(TAG, "Fehler bei der Authentifizierung", e);
-                Toast.makeText(getView(), e.getMessage(), Toast.LENGTH_LONG);
-            }
-            return 1;
-        })
-                .observeOn(AndroidSchedulers.mainThread())
+        PendingIntent postAuthIntent = PendingIntent.getActivity(getView(), 0, new Intent(getView(), AuthActivity.class), PendingIntent.FLAG_ONE_SHOT);
+        authService.getAuthorizationRequest()
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe();
-
+                .subscribe(authorizationRequest -> {
+                    authorizationService.performAuthorizationRequest(authorizationRequest, postAuthIntent);
+                    getView().finish();
+                }, ex -> {
+                    Log.e(TAG, "Fehler bei der Authentifizierung", ex);
+                    authMessage = ex.getMessage();
+                    btnAuthenticateEnabled = true;
+                    publishState();
+                });
     }
 
     @Override
     protected void onTakeView(AuthActivity authActivity) {
         super.onTakeView(authActivity);
-        handleAuth();
+        authService.getAuthorizationService(getView())
+                .map(authorizationService -> {
+                    this.authorizationService = authorizationService;
+                    handleAuth();
+                    return authorizationService;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(authorizationService -> {
+                    authMessage = "";
+                    btnAuthenticateEnabled = true;
+                    publishState();
+                }, ex -> {
+                    Log.e(TAG, "Fehler bei der Authentifizierung", ex);
+                    authMessage = ex.getMessage();
+                    btnAuthenticateEnabled = false;
+                    publishState();
+                });
+        publishState();
     }
 
-    public void handleAuth() {
+    @Override
+    protected void onDropView() {
+        if (authorizationService != null) {
+            authorizationService.dispose();
+            authorizationService = null;
+        }
+        super.onDropView();
+    }
+
+    public void handleAuth() throws AuthorizationException {
         if (getView() != null) {
             AuthorizationResponse resp = AuthorizationResponse.fromIntent(getView().getIntent());
             AuthorizationException ex = AuthorizationException.fromIntent(getView().getIntent());
-            try {
-                boolean authorized = authService.onAuthorization(resp, ex, getView());
-                if (ex != null) {
-                    // show error
-                } else if (authorized && resp != null) {
-                    forwardToMainView();
-                }
-            } catch (AuthException e) {
-                e.printStackTrace();
+            authService.onAuthorization(authorizationService, resp, ex);
+            if (ex != null) {
+                throw ex;
+            } else if (resp != null) {
+                forwardToMainView();
             }
         }
     }
@@ -85,5 +111,13 @@ public class AuthPresenter extends Presenter<AuthActivity> {
     private void forwardToMainView() {
         getView().startActivity(new Intent(getView(), MainActivity.class));
         getView().finish();
+    }
+
+    @MainThread
+    private void publishState() {
+        if(getView() != null) {
+            getView().setAuthMessage(authMessage);
+            getView().enableLoginButton(btnAuthenticateEnabled);
+        }
     }
 }

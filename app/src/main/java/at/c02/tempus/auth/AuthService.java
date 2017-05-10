@@ -13,6 +13,7 @@ import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ResponseTypeValues;
+import net.openid.appauth.TokenResponse;
 import net.openid.appauth.connectivity.ConnectionBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -22,6 +23,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import at.c02.tempus.auth.event.TokenEvent;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.Single;
+import io.reactivex.processors.ReplayProcessor;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.ReplaySubject;
 
 /**
  * Created by Daniel Hartl on 04.05.2017.
@@ -31,48 +38,49 @@ public class AuthService {
 
     private static final String AUTHORIZATION_SERVICE_ENDPOINT = "http://10.0.2.2:5000/.well-known/openid-configuration";
     private static final String REDIRECT_URI = "at.c02.tempus:/oauth2redirect";
-
     private static final String CLIENT_ID = "tempusAndroid";
 
     private static final String TAG = "AuthService";
 
-    private AuthorizationServiceConfiguration authorizationServiceConfiguration;
-
-
     protected AuthHolder authHolder;
 
-    private AuthorizationException authException;
+    private ReplaySubject<AuthorizationServiceConfiguration> authorizationServiceConfigurationReplaySubject;
 
     private EventBus eventBus;
+
 
     public AuthService(EventBus eventBus, AuthHolder authHolder) {
         this.eventBus = eventBus;
         this.authHolder = authHolder;
+
         initializeAuthServiceConfiguration();
     }
 
-    public void initializeAuthServiceConfiguration() {
+    private void initializeAuthServiceConfiguration() {
+        authorizationServiceConfigurationReplaySubject = ReplaySubject.create(1);
+
         AuthorizationServiceConfiguration.fetchFromUrl(Uri.parse(AUTHORIZATION_SERVICE_ENDPOINT),
                 (authorizationServiceConfiguration, e) -> {
                     if (e != null) {
-                        this.authException = e;
-                        Log.e(TAG, "Fehler bei Discovery des AuthTokenEndpoints " + AUTHORIZATION_SERVICE_ENDPOINT, e);
+                        authorizationServiceConfigurationReplaySubject.onError(e);
                     } else {
-                        this.authorizationServiceConfiguration = authorizationServiceConfiguration;
+                        authorizationServiceConfigurationReplaySubject.onNext(authorizationServiceConfiguration);
                     }
+                    authorizationServiceConfigurationReplaySubject.onComplete();
                 }, getConnectionBuilder());
     }
 
-    public AuthorizationRequest getAuthorizationRequest() {
-        return new AuthorizationRequest.Builder(
-                authorizationServiceConfiguration,
-                CLIENT_ID,
-                ResponseTypeValues.CODE,
-                Uri.parse(REDIRECT_URI))
-                .setScopes("api1",
-                        AuthorizationRequest.Scope.OPENID,
-                        AuthorizationRequest.Scope.PROFILE)
-                .build();
+    public Observable<AuthorizationRequest> getAuthorizationRequest() {
+        return authorizationServiceConfigurationReplaySubject.
+                map(authorizationServiceConfiguration -> new AuthorizationRequest.Builder(
+                        authorizationServiceConfiguration,
+                        CLIENT_ID,
+                        ResponseTypeValues.CODE,
+                        Uri.parse(REDIRECT_URI))
+                        .setScopes("api1",
+                                AuthorizationRequest.Scope.OPENID,
+                                AuthorizationRequest.Scope.PROFILE)
+                        .build());
     }
 
     private AppAuthConfiguration getAppAuthConfiguration() {
@@ -90,40 +98,30 @@ public class AuthService {
         };
     }
 
-    public AuthorizationService getAuthorizationService(Context context) throws AuthException {
-        if (authorizationServiceConfiguration == null) {
-            if (authException != null) {
-                throw new AuthException("Die Authentifizierung wurde nicht korrekt initialisiert!", authException);
-            } else {
-                throw new AuthException("Die Authentifizierung wurde nicht korrekt initialisiert!");
-            }
-        }
-
-        AuthorizationService authorizationService = new AuthorizationService(context, getAppAuthConfiguration());
-
-        return authorizationService;
+    public Observable<AuthorizationService> getAuthorizationService(Context context) {
+        return Observable.fromCallable(() -> new AuthorizationService(context, getAppAuthConfiguration()));
     }
 
-    public boolean onAuthorization(AuthorizationResponse resp, AuthorizationException ex, Context context) throws AuthException {
+    public void onAuthorization(AuthorizationService authorizationService,
+                                AuthorizationResponse resp,
+                                AuthorizationException ex
+    ) {
         if (resp != null || ex != null) {
             AuthState authState = new AuthState(resp, ex);
             authHolder.setAuthState(authState);
 
         }
         if (authHolder.getAuthState() != null && authHolder.getAuthState().getLastAuthorizationResponse() != null) {
-            AuthorizationService authorizationService = getAuthorizationService(context);
             authorizationService.performTokenRequest(
                     authHolder.getAuthState().getLastAuthorizationResponse().createTokenExchangeRequest(),
                     (tokenResponse, e) -> {
-                        if (tokenResponse != null || e != null) {
+                        if (tokenResponse != null) {
                             authHolder.getAuthState().update(tokenResponse, e);
                             eventBus.post(new TokenEvent(authHolder.getAuthState()));
                             Log.d(TAG, "Token: " + authHolder.getAuthToken());
                         }
                     });
-            return true;
         }
-        return false;
     }
 
 

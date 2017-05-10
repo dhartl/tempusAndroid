@@ -28,19 +28,22 @@ public class AuthActivity extends NucleusActivity<AuthPresenter> {
     @BindView(R.id.txtAuthMessage)
     protected TextView txtAuthMessage;
 
+    @BindView(R.id.btnAuthenticate)
+    protected Button btnAuthenticate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
-
-        getPresenter().handleAuth();
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        getPresenter().handleAuth();
+    public void setAuthMessage(String authMessage) {
+        txtAuthMessage.setText(authMessage);
+    }
+
+    public void enableLoginButton(boolean enabled){
+        btnAuthenticate.setEnabled(enabled);
     }
 
     @OnClick(R.id.btnAuthenticate)

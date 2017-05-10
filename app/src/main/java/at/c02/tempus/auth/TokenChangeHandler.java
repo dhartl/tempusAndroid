@@ -47,7 +47,7 @@ public class TokenChangeHandler {
             currentUserHolder.setCurrentUser(userData);
             eventBus.post(new UserChangedEvent(userName));
             syncService.synchronize(context);
-        });
+        }, ex -> Log.e(TAG, "failed to load user", ex));
 
     }
 
