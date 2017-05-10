@@ -1,6 +1,8 @@
 package at.c02.tempus.auth;
 
 import net.openid.appauth.AuthState;
+import net.openid.appauth.AuthorizationException;
+import net.openid.appauth.TokenResponse;
 
 /**
  * Created by Daniel Hartl on 05.05.2017.
@@ -12,8 +14,8 @@ public class AuthHolder {
 
 
     public AuthHolder(AuthStatePersister authStatePersister) {
-       authState = authStatePersister.readAuthState();
         this.authStatePersister = authStatePersister;
+        authState = authStatePersister.readAuthState();
     }
 
     public void setAuthState(AuthState authState) {
@@ -30,6 +32,11 @@ public class AuthHolder {
             return authState.getAccessToken();
         }
         return null;
+    }
+
+    public void updateToken(TokenResponse tokenResponse, AuthorizationException ex) {
+        authState.update(tokenResponse, ex);
+        authStatePersister.writeAuthState(authState);
     }
 
 }

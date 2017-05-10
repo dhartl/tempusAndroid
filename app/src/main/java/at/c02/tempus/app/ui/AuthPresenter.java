@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.MainThread;
 import android.util.Log;
-import android.widget.Toast;
 
 import net.openid.appauth.AuthorizationException;
 import net.openid.appauth.AuthorizationResponse;
@@ -15,10 +14,8 @@ import org.greenrobot.eventbus.EventBus;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
-import at.c02.tempus.auth.AuthException;
 import at.c02.tempus.auth.AuthHolder;
 import at.c02.tempus.auth.AuthService;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
@@ -99,12 +96,14 @@ public class AuthPresenter extends Presenter<AuthActivity> {
         if (getView() != null) {
             AuthorizationResponse resp = AuthorizationResponse.fromIntent(getView().getIntent());
             AuthorizationException ex = AuthorizationException.fromIntent(getView().getIntent());
-            authService.onAuthorization(authorizationService, resp, ex);
-            if (ex != null) {
-                throw ex;
-            } else if (resp != null) {
-                forwardToMainView();
-            }
+            authService.onAuthorization(authorizationService, resp, ex)
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .subscribe(tokenResponse -> {
+                        forwardToMainView();
+                    }, tokenException -> {
+                        authMessage = tokenException.getMessage();
+                        publishState();
+                    });
         }
     }
 
@@ -115,7 +114,7 @@ public class AuthPresenter extends Presenter<AuthActivity> {
 
     @MainThread
     private void publishState() {
-        if(getView() != null) {
+        if (getView() != null) {
             getView().setAuthMessage(authMessage);
             getView().enableLoginButton(btnAuthenticateEnabled);
         }

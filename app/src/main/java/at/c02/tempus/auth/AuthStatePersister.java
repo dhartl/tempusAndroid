@@ -52,7 +52,7 @@ public class AuthStatePersister {
                     .putString(AUTH_PREF_STATE_JSON, state.jsonSerializeString())
                     .apply();
         }else{
-            authPrefs.edit().remove(AUTH_PREF_STATE_JSON);
+            authPrefs.edit().clear().commit();
         }
     }
 }

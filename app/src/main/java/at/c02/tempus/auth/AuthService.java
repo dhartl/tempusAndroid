@@ -24,10 +24,7 @@ import java.net.URL;
 
 import at.c02.tempus.auth.event.TokenEvent;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.Single;
-import io.reactivex.processors.ReplayProcessor;
-import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.ReplaySubject;
 
 /**
@@ -102,26 +99,39 @@ public class AuthService {
         return Observable.fromCallable(() -> new AuthorizationService(context, getAppAuthConfiguration()));
     }
 
-    public void onAuthorization(AuthorizationService authorizationService,
-                                AuthorizationResponse resp,
-                                AuthorizationException ex
+    public Observable<TokenResponse> onAuthorization(AuthorizationService authorizationService,
+                                                     AuthorizationResponse resp,
+                                                     AuthorizationException ex
     ) {
         if (resp != null || ex != null) {
             AuthState authState = new AuthState(resp, ex);
             authHolder.setAuthState(authState);
+        }
 
-        }
-        if (authHolder.getAuthState() != null && authHolder.getAuthState().getLastAuthorizationResponse() != null) {
-            authorizationService.performTokenRequest(
-                    authHolder.getAuthState().getLastAuthorizationResponse().createTokenExchangeRequest(),
-                    (tokenResponse, e) -> {
-                        if (tokenResponse != null) {
-                            authHolder.getAuthState().update(tokenResponse, e);
-                            eventBus.post(new TokenEvent(authHolder.getAuthState()));
-                            Log.d(TAG, "Token: " + authHolder.getAuthToken());
-                        }
-                    });
-        }
+        return Single.<TokenResponse>create(singleEmitter -> {
+            if (authHolder.getAuthState() != null) {
+                if (authHolder.getAuthToken() == null && authHolder.getAuthState().getLastAuthorizationResponse() != null) {
+                    authorizationService.performTokenRequest(
+                            authHolder.getAuthState().getLastAuthorizationResponse().createTokenExchangeRequest(),
+                            (tokenResponse, e) -> {
+                                authHolder.updateToken(tokenResponse, e);
+                                if (e != null) {
+                                    singleEmitter.onError(e);
+                                } else if (tokenResponse != null) {
+                                    eventBus.post(new TokenEvent(authHolder.getAuthState()));
+                                    Log.d(TAG, "Token: " + authHolder.getAuthToken());
+                                    singleEmitter.onSuccess(tokenResponse);
+                                }
+                            });
+                } else if (authHolder.getAuthState().getLastAuthorizationResponse() != null) {
+                    eventBus.post(new TokenEvent(authHolder.getAuthState()));
+                    Log.d(TAG, "Token: " + authHolder.getAuthToken());
+                    singleEmitter.onSuccess(authHolder.getAuthState().getLastTokenResponse());
+                }
+            } else {
+                singleEmitter.onError(new AuthException("Keine Authentifizierung vorhanden"));
+            }
+        }).toObservable();
     }
 
 
