@@ -11,7 +11,7 @@
  */
 
 
-package at.c02.tempus.api;
+package at.c02.tempus.utils;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2017-04-08T22:14:53.361+02:00")
 public class StringUtil {

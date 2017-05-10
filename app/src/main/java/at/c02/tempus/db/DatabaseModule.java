@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.greenrobot.greendao.database.Database;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import javax.inject.Singleton;
 
@@ -20,14 +21,19 @@ import dagger.Provides;
  */
 @Module
 public class DatabaseModule {
-    private static final String TAG="databaseModule";
+    private static final String TAG = "databaseModule";
+
     @Provides
     @Singleton
     public DaoSession provideDaoSession(Context context) {
         Log.d(TAG, "initializing DAO Session");
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "tempus-db");
         Database db = helper.getWritableDb();
-        return new DaoMaster(db).newSession();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        QueryBuilder.LOG_SQL = true;
+        QueryBuilder.LOG_VALUES = true;
+        return daoSession;
     }
 
     @Provides

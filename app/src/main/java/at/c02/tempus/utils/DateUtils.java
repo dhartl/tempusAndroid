@@ -1,4 +1,4 @@
-package at.c02.tempus.app.ui.utils;
+package at.c02.tempus.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +17,21 @@ public class DateUtils {
 
     public static DateFormat getTimeFormat() {
         return new SimpleDateFormat("HH:mm");
+    }
+
+    public static DateFormat getDateTimeFormat() {
+        return new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    }
+
+    private static DateFormat getQueryDateFormat() {
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    }
+
+    public static String formatQueryDate(Date date) {
+        if(date == null) {
+            return null;
+        }
+        return getQueryDateFormat().format(date);
     }
 
     public static Calendar dateToCalendar(Date date) {
@@ -59,5 +74,11 @@ public class DateUtils {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
+    }
+
+    public static Date getDateBefore(int time, int timeUnit) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(timeUnit, (-1) * time);
+        return calendar.getTime();
     }
 }

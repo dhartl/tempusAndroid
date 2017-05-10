@@ -1,7 +1,10 @@
 package at.c02.tempus.app.ui.bookinglist;
 
-import android.content.Context;
-import android.util.Log;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Date;
 import java.util.List;
@@ -9,11 +12,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
-import at.c02.tempus.app.ui.utils.DateUtils;
+import at.c02.tempus.utils.DateUtils;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.service.BookingService;
 import at.c02.tempus.service.ProjectService;
+import at.c02.tempus.service.event.ProjectsChangedEvent;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
@@ -25,7 +29,7 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
 
     private static final String TAG = "BookingActivityPres";
 
-    private BookingEntity model;
+    private BookingEntity model = new BookingEntity();
 
     @Inject
     protected BookingService bookingService;
@@ -33,12 +37,68 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
     @Inject
     protected ProjectService projectService;
 
+    @Inject
+    protected EventBus eventBus;
+
     private List<ProjectEntity> projects;
     private Throwable error;
 
     public BookingActivityPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
-        model = new BookingEntity();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedState) {
+        super.onCreate(savedState);
+        eventBus.register(this);
+
+        projectService.getProjects()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                            this.projects = result;
+                            publishProjects();
+                        }, error -> {
+                            this.error = error;
+                            publishProjects();
+                        }
+                );
+    }
+
+    @Override
+    protected void onDestroy() {
+        eventBus.unregister(this);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onTakeView(BookingActivity bookingActivity) {
+        super.onTakeView(bookingActivity);
+        if (bookingActivity.getIntent().hasExtra(BookingActivity.EXTRA_BOOKING_ID)) {
+            long bookingId = getView().getIntent().getLongExtra(BookingActivity.EXTRA_BOOKING_ID, -1);
+            bookingService.getBookingById(bookingId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        if (result.isPresent()) {
+                            this.model = result.get();
+                        } else {
+                            this.error = new RuntimeException("Die Buchung " + bookingId + " existiert nicht!");
+                        }
+                        publishBooking();
+                    }, error -> {
+                        this.error = error;
+                        publishBooking();
+                    });
+        } else {
+            bookingService.createNewBooking()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        this.model = result;
+                        publishBooking();
+                    }, error -> {
+                        this.error = error;
+                        publishBooking();
+                    });
+        }
     }
 
     public BookingEntity getModel() {
@@ -49,23 +109,21 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         this.model = model;
     }
 
-    @Override
-    protected void onTakeView(BookingActivity bookingActivity) {
-        super.onTakeView(bookingActivity);
-        Log.d(TAG, "onTakeView");
-        bookingActivity.updateStartDate(model.getBeginDate());
-        bookingActivity.updateEndDate(model.getEndDate());
-        projectService.getProjects()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                            this.projects = result;
-                            publishProjects();
-                        }, error -> {
-                            this.error = error;
-                            publishProjects();
-                        }
-
-                );
+    private void publishBooking() {
+        if (getView() != null) {
+            if (model != null) {
+                getView().updateStartDate(model.getBeginDate());
+                getView().updateEndDate(model.getEndDate());
+                getView().updateProject(model.getProject());
+            } else {
+                getView().updateStartDate(null);
+                getView().updateEndDate(null);
+                getView().updateProject(null);
+                if (error != null) {
+                    getView().onError(error);
+                }
+            }
+        }
     }
 
     private void publishProjects() {
@@ -102,8 +160,42 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
         getView().updateEndDate(newEndDate);
     }
 
+
     public void save() {
-        bookingService.createOrUpdateBooking(model);
+        boolean valid = validate(model);
+        if (valid) {
+            model = bookingService.createOrUpdateBooking(model);
+            getView().onSaveSuccessful(model);
+        } else {
+            getView().onError(error);
+        }
+
     }
 
+    private boolean validate(BookingEntity model) {
+        boolean successful = false;
+        try {
+            bookingService.validateBooking(model);
+            successful = true;
+        } catch (RuntimeException ex) {
+            error = ex;
+        }
+        return successful;
+    }
+
+    public void setProject(ProjectEntity project) {
+        if (model != null) {
+            model.setProject(project);
+        }
+    }
+
+    @Subscribe
+    public void onProjectsChange(ProjectsChangedEvent event) {
+        this.projects = event.getProjects();
+        publishProjects();
+    }
+
+    public void deleteBooking() {
+        bookingService.deleteBooking(model);
+    }
 }

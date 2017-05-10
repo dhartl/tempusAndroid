@@ -13,6 +13,9 @@ android {
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled false
+        manifestPlaceholders = [
+                'appAuthRedirectScheme': 'at.c02.tempus'
+        ]
     }
     buildTypes {
         release {
@@ -58,16 +61,12 @@ dependencies {
 
     // Network
     compile "com.squareup.retrofit2:retrofit:$retrofit_version"
-    compile "com.squareup.okhttp3:okhttp:3.3.1"
+    compile "com.squareup.okhttp3:okhttp:3.6.0"
     compile "com.squareup.retrofit2:converter-scalars:$retrofit_version"
     compile "com.squareup.retrofit2:converter-gson:$retrofit_version"
     compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-    compile "com.squareup.okhttp3:logging-interceptor:3.3.1"
+    compile "com.squareup.okhttp3:logging-interceptor:3.6.0"
     compile "io.swagger:swagger-annotations:$swagger_annotations_version"
-    compile ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2") {
-        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
-        exclude group: 'org.json', module: 'json'
-    }
 
     // Dependency Injection
     compile 'com.google.dagger:dagger:2.4'
@@ -84,7 +83,11 @@ dependencies {
 
     //Model-View-Presenter
     compile 'info.android15.nucleus:nucleus:4.0.0'
+    compile 'info.android15.nucleus:nucleus-support-v4:4.0.0'
     compile 'info.android15.nucleus:nucleus-support-v7:4.0.0'
+
+    // Authorization
+    compile 'net.openid:appauth:0.6.0'
 
     // rxjava
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -92,7 +95,12 @@ dependencies {
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
 
+    compile 'eu.davidea:flexible-adapter:5.0.0-rc1'
+    compile 'com.fernandocejas:arrow:1.0.0'
+
     testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-junit:1.0.0.1'
+
     annotationProcessor 'com.google.dagger:dagger-compiler:2.4'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }

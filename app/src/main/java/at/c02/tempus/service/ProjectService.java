@@ -1,38 +1,52 @@
 package at.c02.tempus.service;
 
-import java.util.ArrayList;
+import android.util.Log;
+
+import com.fernandocejas.arrow.optional.Optional;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import at.c02.tempus.api.api.ProjectApi;
-import at.c02.tempus.api.model.Project;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.db.repository.ProjectRepository;
-import io.reactivex.Flowable;
+import at.c02.tempus.service.event.ProjectsChangedEvent;
+import at.c02.tempus.service.mapping.ProjectMapping;
+import at.c02.tempus.service.sync.status.SyncResult;
+import at.c02.tempus.service.sync.status.SyncStatusFinder;
+import at.c02.tempus.service.sync.status.UpdateDetectorFactory;
+import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
 /**
  * Created by Daniel on 09.04.2017.
  */
 
+@Singleton
 public class ProjectService {
-    private ProjectApi projectApi;
-    private ProjectRepository projectRepository;
+    private static final String TAG = "ProjectService";
 
-    public ProjectService(ProjectApi projectApi, ProjectRepository projectRepository) {
-        this.projectApi = projectApi;
-        this.projectRepository = projectRepository;
+    @Inject
+    protected ProjectRepository projectRepository;
+
+    @Inject
+    public ProjectService() {
     }
 
-    public Flowable<List<ProjectEntity>> getProjects() {
+    public Observable<List<ProjectEntity>> getProjects() {
+        return Observable.fromCallable(projectRepository::findAll);
+    }
 
-        return Flowable.fromCallable(() -> {
-            List<ProjectEntity>projects = new ArrayList<>();
-            projects.add(new ProjectEntity(1L,1L,"Projekt 1"));
-            projects.add(new ProjectEntity(2L,2L,"Projekt 2"));
-            projects.add(new ProjectEntity(3L,3L,"Projekt 3"));
-            projects.add(new ProjectEntity(4L,4L,"Projekt 4"));
-            projects.add(new ProjectEntity(5L,5L,"Projekt 5"));
-            return projects;
-        });
+    public Observable<Optional<ProjectEntity>> getDefaultProject() {
+        return Observable.fromCallable(() -> Optional.fromNullable(projectRepository.findDefaultProject()));
+    }
+
+
+    public Observable<ProjectEntity> findProjectByExternalId(Long externalProjectId) {
+        return Observable.fromCallable(() -> projectRepository.findByExternalId(externalProjectId));
     }
 }

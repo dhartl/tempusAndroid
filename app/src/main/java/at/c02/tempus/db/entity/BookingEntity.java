@@ -19,7 +19,8 @@ public class BookingEntity {
 
     @Id
     private Long id;
-    private Long bookingId = null;
+
+    private Long externalId;
 
     private Long projectId;
 
@@ -43,21 +44,22 @@ public class BookingEntity {
     /** Used for active entity operations. */
     @Generated(hash = 1776279694)
     private transient BookingEntityDao myDao;
+    
 
-    @Generated(hash = 381078719)
-    public BookingEntity(Long id, Long bookingId, Long projectId, Long employeeId,
+    @Generated(hash = 952443125)
+    public BookingEntity() {
+    }
+
+    @Generated(hash = 1064339433)
+    public BookingEntity(Long id, Long externalId, Long projectId, Long employeeId,
             Date beginDate, Date endDate, EntityStatus syncStatus) {
         this.id = id;
-        this.bookingId = bookingId;
+        this.externalId = externalId;
         this.projectId = projectId;
         this.employeeId = employeeId;
         this.beginDate = beginDate;
         this.endDate = endDate;
         this.syncStatus = syncStatus;
-    }
-
-    @Generated(hash = 952443125)
-    public BookingEntity() {
     }
 
     public Long getId() {
@@ -66,14 +68,6 @@ public class BookingEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getBookingId() {
-        return this.bookingId;
-    }
-
-    public void setBookingId(Long bookingId) {
-        this.bookingId = bookingId;
     }
 
     public Long getProjectId() {
@@ -214,6 +208,14 @@ public class BookingEntity {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public Long getExternalId() {
+        return this.externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 
     /** called by internal mechanisms, do not call yourself. */
