@@ -1,23 +1,15 @@
 package at.c02.tempus.service.sync;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.api.BookingApi;
 import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.db.entity.BookingEntity;
-import at.c02.tempus.db.entity.EntityStatus;
-import at.c02.tempus.db.repository.BookingRepository;
-import at.c02.tempus.service.EmployeeService;
-import at.c02.tempus.service.event.BookingsChangedEvent;
 import at.c02.tempus.service.mapping.BookingMapping;
 import at.c02.tempus.service.sync.status.ItemChange;
 import at.c02.tempus.service.sync.status.SyncResult;
-import at.c02.tempus.service.sync.status.SyncStatusFinder;
 import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
@@ -39,7 +31,8 @@ public class BookingToServerSyncService extends AbstractBookingSyncService {
 
     @Override
     protected Observable<List<BookingEntity>> loadLegacyItems() {
-        return Observable.fromCallable(() -> bookingRepository.findModifiedEntries());
+        return employeeService.getCurrentEmployee()
+                .map(currentEmployee -> bookingRepository.findModifiedEntries(currentEmployee.get().getId()));
     }
 
 
