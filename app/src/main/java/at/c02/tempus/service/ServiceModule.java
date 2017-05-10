@@ -4,8 +4,6 @@ import org.greenrobot.eventbus.EventBus;
 
 import javax.inject.Singleton;
 
-import at.c02.tempus.auth.AuthHolder;
-import at.c02.tempus.auth.AuthService;
 import at.c02.tempus.service.sync.BookingFromServerSyncService;
 import at.c02.tempus.service.sync.BookingToServerSyncService;
 import at.c02.tempus.service.sync.EmployeeSyncService;
@@ -39,15 +37,4 @@ public class ServiceModule {
         return EventBus.builder().logSubscriberExceptions(true).installDefaultEventBus();
     }
 
-    @Provides
-    @Singleton
-    public AuthHolder provideAuthHolder() {
-        return new AuthHolder();
-    }
-
-    @Provides
-    @Singleton
-    public AuthService provideAuthService(EventBus eventBus, AuthHolder authHolder) {
-        return new AuthService(eventBus, authHolder);
-    }
 }

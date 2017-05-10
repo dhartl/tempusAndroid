@@ -12,20 +12,16 @@ import net.openid.appauth.AuthorizationRequest;
 import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
-import net.openid.appauth.ClientAuthentication;
-import net.openid.appauth.ClientSecretPost;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.connectivity.ConnectionBuilder;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import at.c02.tempus.auth.events.AuthenticationEvent;
-import at.c02.tempus.auth.events.TokenEvent;
+import at.c02.tempus.auth.event.TokenEvent;
 
 /**
  * Created by Daniel Hartl on 04.05.2017.
@@ -45,14 +41,13 @@ public class AuthService {
 
     protected AuthHolder authHolder;
 
-    protected EventBus eventBus;
-
     private AuthorizationException authException;
+
+    private EventBus eventBus;
 
     public AuthService(EventBus eventBus, AuthHolder authHolder) {
         this.eventBus = eventBus;
         this.authHolder = authHolder;
-        eventBus.register(this);
         initializeAuthServiceConfiguration();
     }
 
@@ -74,7 +69,9 @@ public class AuthService {
                 CLIENT_ID,
                 ResponseTypeValues.CODE,
                 Uri.parse(REDIRECT_URI))
-                .setScope("api1")
+                .setScopes("api1",
+                        AuthorizationRequest.Scope.OPENID,
+                        AuthorizationRequest.Scope.PROFILE)
                 .build();
     }
 
@@ -107,35 +104,28 @@ public class AuthService {
         return authorizationService;
     }
 
-    private ClientAuthentication getClientAuthentication() {
-        return new ClientSecretPost("tempusAndroidPassword");
-    }
-
-    public void onAuthorization(AuthorizationResponse resp, AuthorizationException ex, Context context) throws AuthException {
+    public boolean onAuthorization(AuthorizationResponse resp, AuthorizationException ex, Context context) throws AuthException {
         if (resp != null || ex != null) {
             AuthState authState = new AuthState(resp, ex);
             authHolder.setAuthState(authState);
+
+        }
+        if (authHolder.getAuthState() != null && authHolder.getAuthState().getLastAuthorizationResponse() != null) {
             AuthorizationService authorizationService = getAuthorizationService(context);
-            authorizationService.performTokenRequest(resp.createTokenExchangeRequest(),
+            authorizationService.performTokenRequest(
+                    authHolder.getAuthState().getLastAuthorizationResponse().createTokenExchangeRequest(),
                     (tokenResponse, e) -> {
-                        eventBus.post(new TokenEvent(tokenResponse, e));
+                        if (tokenResponse != null || e != null) {
+                            authHolder.getAuthState().update(tokenResponse, e);
+                            eventBus.post(new TokenEvent(authHolder.getAuthState()));
+                            Log.d(TAG, "Token: " + authHolder.getAuthToken());
+                        }
                     });
+            return true;
         }
+        return false;
     }
 
-    @Subscribe
-    public void onAuthenticationEvent(AuthenticationEvent event) {
-
-
-    }
-
-    @Subscribe
-    public void onTokenEvent(TokenEvent event) {
-        if (event.getTokenResponse() != null || event.getAuthorizationException() != null) {
-            authHolder.getAuthState().update(event.getTokenResponse(), event.getAuthorizationException());
-            Log.d(TAG, "Token: " + authHolder.getAuthToken());
-        }
-    }
 
     public void logout(Context context) {
         authHolder.setAuthState(null);
@@ -148,9 +138,8 @@ public class AuthService {
             customTabsIntent.intent.setPackage("com.android.chrome");
             customTabsIntent.launchUrl(context, Uri.parse(url));
 
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             Log.e(TAG, "Fehler beim revoken des Access-Tokens");
         }
     }
-
 }

@@ -1,9 +1,11 @@
 package at.c02.tempus.app.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 
@@ -12,6 +14,7 @@ import at.c02.tempus.auth.AuthService;
 import at.c02.tempus.db.entity.EmployeeEntity;
 import at.c02.tempus.service.EmployeeService;
 import at.c02.tempus.service.SyncService;
+import at.c02.tempus.service.event.EmployeeChangedEvent;
 import nucleus.presenter.Presenter;
 
 /**
@@ -29,6 +32,9 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
     @Inject
     protected AuthService authService;
 
+    @Inject
+    protected EventBus eventBus;
+
     private EmployeeEntity employeeEntity;
 
     public MainActivityPresenter() {
@@ -39,15 +45,24 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
+        eventBus.register(this);
+    }
 
+    @Override
+    protected void onDestroy() {
+        eventBus.unregister(this);
+        super.onDestroy();
     }
 
     @Override
     protected void onTakeView(MainActivity mainActivity) {
         super.onTakeView(mainActivity);
-        syncService.synchronize(getView());
+        loadEmployee();
+    }
+
+    private void loadEmployee() {
         employeeService.getCurrentEmployee().subscribe(employeeEntity -> {
-            this.employeeEntity = employeeEntity;
+            this.employeeEntity = employeeEntity.orNull();
             publishEmployee();
         });
     }
@@ -69,5 +84,11 @@ public class MainActivityPresenter extends Presenter<MainActivity> {
     public void logout() {
         authService.logout(getView());
         getView().finish();
+    }
+
+    @Subscribe
+    public void onEmployeeChangedEvent(EmployeeChangedEvent event) {
+        this.employeeEntity = event.getEmployee();
+        publishEmployee();
     }
 }

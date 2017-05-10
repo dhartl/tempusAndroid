@@ -8,23 +8,15 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.service.event.BookingChangedEvent;
 import at.c02.tempus.service.sync.BookingFromServerSyncService;
 import at.c02.tempus.service.sync.BookingToServerSyncService;
 import at.c02.tempus.service.sync.EmployeeSyncService;
 import at.c02.tempus.service.sync.ProjectSyncService;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -68,10 +60,8 @@ public class SyncService {
 
     public void synchronize(Context context) {
         Log.d(TAG, "Sync started");
-        Observable.concat(
-                employeeSyncService.syncronize()
-                        .flatMap(result -> synchronizeBookings()),
-                projectSyncService.syncronize())
+        employeeSyncService.syncronize().flatMap(result -> projectSyncService.syncronize())
+                .flatMap(result -> synchronizeBookings())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(result -> {

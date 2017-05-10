@@ -7,29 +7,18 @@ import com.fernandocejas.arrow.optional.Optional;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.api.BookingApi;
-import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.EmployeeEntity;
 import at.c02.tempus.db.entity.EntityStatus;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.db.repository.BookingRepository;
 import at.c02.tempus.service.event.BookingChangedEvent;
-import at.c02.tempus.service.event.BookingsChangedEvent;
-import at.c02.tempus.service.mapping.BookingMapping;
-import at.c02.tempus.service.mapping.MappingUtils;
-import at.c02.tempus.service.sync.status.ItemChange;
-import at.c02.tempus.service.sync.status.SyncResult;
-import at.c02.tempus.service.sync.status.SyncStatusFinder;
-import at.c02.tempus.service.sync.status.UpdateDetectorFactory;
-import at.c02.tempus.utils.CollectionUtils;
 import io.reactivex.Observable;
 
 /**
@@ -106,13 +95,13 @@ public class BookingService {
     }
 
     public Observable<BookingEntity> createNewBooking() {
-        Observable<EmployeeEntity> currentEmployee = employeeService.getCurrentEmployee();
+        Observable<Optional<EmployeeEntity>> currentEmployee = employeeService.getCurrentEmployee();
         Observable<Optional<BookingEntity>> lastBooking = getLastBooking();
 
         return Observable.zip(currentEmployee, lastBooking,
                 (employee, previousBooking) -> {
                     BookingEntity newBooking = new BookingEntity();
-                    newBooking.setEmployee(employee);
+                    newBooking.setEmployee(employee.get());
                     newBooking.setSyncStatus(EntityStatus.UNKNOWN);
                     Date now = new Date();
                     Date startDate = null;

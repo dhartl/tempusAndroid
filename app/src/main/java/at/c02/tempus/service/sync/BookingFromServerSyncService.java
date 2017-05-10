@@ -1,6 +1,6 @@
 package at.c02.tempus.service.sync;
 
-import org.greenrobot.eventbus.EventBus;
+import com.fernandocejas.arrow.optional.Optional;
 
 import java.util.Calendar;
 import java.util.List;
@@ -8,20 +8,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.api.BookingApi;
-import at.c02.tempus.api.model.Booking;
-import at.c02.tempus.api.model.Employee;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.EmployeeEntity;
-import at.c02.tempus.db.entity.EntityStatus;
-import at.c02.tempus.db.repository.BookingRepository;
-import at.c02.tempus.service.EmployeeService;
-import at.c02.tempus.service.ProjectService;
-import at.c02.tempus.service.event.BookingsChangedEvent;
-import at.c02.tempus.service.mapping.BookingMapping;
 import at.c02.tempus.service.mapping.MappingUtils;
-import at.c02.tempus.service.sync.status.SyncStatusFinder;
-import at.c02.tempus.service.sync.status.UpdateDetectorFactory;
 import at.c02.tempus.utils.CollectionUtils;
 import at.c02.tempus.utils.DateUtils;
 import io.reactivex.Observable;
@@ -46,6 +35,7 @@ public class BookingFromServerSyncService extends AbstractBookingSyncService {
     protected Observable<List<BookingEntity>> loadLegacyItems() {
         return bookingApi.findBookingsForEmployeeAndDate(
                 employeeService.getCurrentEmployee()
+                        .map(Optional::get)
                         .map(EmployeeEntity::getExternalId)
                         .map(MappingUtils::fromLong)
                         .blockingFirst(-1),

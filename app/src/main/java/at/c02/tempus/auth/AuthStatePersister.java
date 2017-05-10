@@ -35,7 +35,6 @@ public class AuthStatePersister {
     public AuthState readAuthState() {
         SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREF, MODE_PRIVATE);
         String stateJson = authPrefs.getString(AUTH_PREF_STATE_JSON, null);
-        AuthState state;
         if (stateJson != null) {
             try {
                 return AuthState.jsonDeserialize(stateJson);
@@ -46,10 +45,14 @@ public class AuthStatePersister {
         return new AuthState();
     }
 
-    public void writeAuthState(@NonNull AuthState state) {
+    public void writeAuthState(AuthState state) {
         SharedPreferences authPrefs = context.getSharedPreferences(AUTH_PREF, MODE_PRIVATE);
-        authPrefs.edit()
-                .putString(AUTH_PREF_STATE_JSON, state.jsonSerializeString())
-                .apply();
+        if(state != null) {
+            authPrefs.edit()
+                    .putString(AUTH_PREF_STATE_JSON, state.jsonSerializeString())
+                    .apply();
+        }else{
+            authPrefs.edit().remove(AUTH_PREF_STATE_JSON);
+        }
     }
 }

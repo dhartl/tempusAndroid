@@ -1,4 +1,4 @@
-package at.c02.tempus.api;
+package at.c02.tempus.auth;
 
 import java.io.IOException;
 

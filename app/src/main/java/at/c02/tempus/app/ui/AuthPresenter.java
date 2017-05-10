@@ -11,15 +11,13 @@ import net.openid.appauth.AuthorizationService;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.Observable;
-
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.auth.AuthException;
+import at.c02.tempus.auth.AuthHolder;
 import at.c02.tempus.auth.AuthService;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import nucleus.presenter.Presenter;
 
 /**
@@ -31,6 +29,9 @@ public class AuthPresenter extends Presenter<AuthActivity> {
 
     @Inject
     protected AuthService authService;
+
+    @Inject
+    protected AuthHolder authHolder;
 
     @Inject
     protected EventBus eventBus;
@@ -58,7 +59,6 @@ public class AuthPresenter extends Presenter<AuthActivity> {
 
     }
 
-
     @Override
     protected void onTakeView(AuthActivity authActivity) {
         super.onTakeView(authActivity);
@@ -70,16 +70,20 @@ public class AuthPresenter extends Presenter<AuthActivity> {
             AuthorizationResponse resp = AuthorizationResponse.fromIntent(getView().getIntent());
             AuthorizationException ex = AuthorizationException.fromIntent(getView().getIntent());
             try {
-                authService.onAuthorization(resp, ex, getView());
+                boolean authorized = authService.onAuthorization(resp, ex, getView());
                 if (ex != null) {
                     // show error
-                } else if (resp != null) {
-                    getView().startActivity(new Intent(getView(), MainActivity.class));
-                    getView().finish();
+                } else if (authorized && resp != null) {
+                    forwardToMainView();
                 }
             } catch (AuthException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void forwardToMainView() {
+        getView().startActivity(new Intent(getView(), MainActivity.class));
+        getView().finish();
     }
 }
