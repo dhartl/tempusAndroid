@@ -9,9 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import at.c02.tempus.api.api.EmployeeApi;
+import at.c02.tempus.auth.CurrentUserHolder;
 import at.c02.tempus.db.entity.EmployeeEntity;
 import at.c02.tempus.db.repository.EmployeeRepository;
-import at.c02.tempus.service.EmployeeService;
 import at.c02.tempus.service.event.EmployeeChangedEvent;
 import at.c02.tempus.service.mapping.EmployeeMapping;
 import at.c02.tempus.service.sync.status.SyncStatusFinder;
@@ -30,6 +30,8 @@ public class EmployeeSyncService extends AbstractSyncService<EmployeeEntity> {
     @Inject
     protected EmployeeRepository employeeRepository;
     @Inject
+    protected CurrentUserHolder currentUserHolder;
+    @Inject
     protected EventBus eventBus;
 
     @Inject
@@ -46,7 +48,7 @@ public class EmployeeSyncService extends AbstractSyncService<EmployeeEntity> {
 
     @Override
     protected Observable<List<EmployeeEntity>> loadLegacyItems() {
-        return employeeApi.findEmployeeByUserName(EmployeeService.CURRENT_USER)
+        return employeeApi.findEmployeeByUserName(currentUserHolder.getCurrentUser())
                 .map(EmployeeMapping::toEmployeeEntity)
                 .map(Collections::singletonList);
     }
@@ -59,7 +61,7 @@ public class EmployeeSyncService extends AbstractSyncService<EmployeeEntity> {
     @Override
     protected void publishResults() {
         eventBus.post(new EmployeeChangedEvent(
-                employeeRepository.findByUserName(EmployeeService.CURRENT_USER)));
+                employeeRepository.findByUserName(currentUserHolder.getCurrentUser())));
     }
 
     @Override

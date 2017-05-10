@@ -11,13 +11,6 @@ import dagger.Provides;
 @Module
 public class ApiModule {
 
-    @Provides
-    @Singleton
-    public ApiClient provideApiClient() {
-        // FIXME: Api-Client initialisierung
-        return new ApiClient();
-    }
-
     // APIs here
     @Provides
     @Singleton

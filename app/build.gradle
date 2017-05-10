@@ -13,6 +13,9 @@ android {
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled false
+        manifestPlaceholders = [
+                'appAuthRedirectScheme': 'at.c02.tempus'
+        ]
     }
     buildTypes {
         release {
@@ -82,6 +85,9 @@ dependencies {
     compile 'info.android15.nucleus:nucleus:4.0.0'
     compile 'info.android15.nucleus:nucleus-support-v4:4.0.0'
     compile 'info.android15.nucleus:nucleus-support-v7:4.0.0'
+
+    // Authorization
+    compile 'net.openid:appauth:0.6.0'
 
     // rxjava
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

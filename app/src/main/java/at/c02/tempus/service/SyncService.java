@@ -1,28 +1,22 @@
 package at.c02.tempus.service;
 
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.api.model.Booking;
 import at.c02.tempus.service.event.BookingChangedEvent;
 import at.c02.tempus.service.sync.BookingFromServerSyncService;
 import at.c02.tempus.service.sync.BookingToServerSyncService;
 import at.c02.tempus.service.sync.EmployeeSyncService;
 import at.c02.tempus.service.sync.ProjectSyncService;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -64,16 +58,18 @@ public class SyncService {
         eventBus.register(this);
     }
 
-    public void synchronize() {
+    public void synchronize(Context context) {
         Log.d(TAG, "Sync started");
-        Observable.concat(
-                employeeSyncService.syncronize()
-                        .flatMap(result -> synchronizeBookings()),
-                projectSyncService.syncronize())
-                .observeOn(Schedulers.io())
+        employeeSyncService.syncronize().flatMap(result -> projectSyncService.syncronize())
+                .flatMap(result -> synchronizeBookings())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(result -> {
-                }, error -> Log.e(TAG, "Fehler bei der Synchronisation", error));
+                    Toast.makeText(context, "Synchronisation abgeschlossen", Toast.LENGTH_SHORT).show();
+                }, error -> {
+                    Toast.makeText(context, "Fehler bei der Synchronisation", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Fehler bei der Synchronisation", error);
+                });
 
     }
 

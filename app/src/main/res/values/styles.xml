@@ -20,5 +20,8 @@
         <item name="android:textColor">?android:textColorSecondary</item>
     </style>
 
+    <style name="Error">
+        <item name="android:textColor">@color/error</item>
+    </style>
 
 </resources>

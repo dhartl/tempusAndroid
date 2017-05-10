@@ -4,7 +4,6 @@ import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
 
-import at.c02.tempus.api.model.Employee;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.BookingEntityDao;
 import at.c02.tempus.db.entity.EmployeeEntity;
@@ -40,7 +39,7 @@ public class BookingRepository extends AbstractRepository<BookingEntity, Long, B
         return dao.loadDeep(id);
     }
 
-    public List<BookingEntity> findModifiedEntries() {
+    public List<BookingEntity> findModifiedEntries(Long employeeId) {
         QueryBuilder<BookingEntity> queryBuilder = dao.queryBuilder();
         queryBuilder.join(BookingEntityDao.Properties.ProjectId, ProjectEntity.class);
         queryBuilder.join(BookingEntityDao.Properties.EmployeeId, EmployeeEntity.class);
@@ -48,8 +47,9 @@ public class BookingRepository extends AbstractRepository<BookingEntity, Long, B
                 .where(BookingEntityDao.Properties.SyncStatus.in(
                         EntityStatus.DELETED.getId(),
                         EntityStatus.MODIFIED.getId(),
-                        EntityStatus.NEW.getId()
-                )).list();
+                        EntityStatus.NEW.getId()),
+                        BookingEntityDao.Properties.EmployeeId.eq(employeeId)
+                ).list();
     }
 
     public List<BookingEntity> findServerBookings() {

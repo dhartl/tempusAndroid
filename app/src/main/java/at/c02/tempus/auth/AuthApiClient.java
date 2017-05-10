@@ -1,4 +1,4 @@
-package at.c02.tempus.api;
+package at.c02.tempus.auth;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import at.c02.tempus.auth.AuthInterceptor;
+import at.c02.tempus.api.DateDeserializer;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -20,11 +20,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Singleton
-public class ApiClient {
+public class AuthApiClient {
 
     // 10.0.2.2 ist ip von Localhost für den Emulator
     // Wenn Handy verwendet wird, dann muss hier die Ip des PCs eingetragen werden!
-    public static final String BASE_URL = "http://10.0.2.2:5001/";
+    public static final String BASE_URL = "http://10.0.2.2:5000/";
 
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder;
@@ -33,7 +33,7 @@ public class ApiClient {
     protected AuthInterceptor authInterceptor;
 
     @Inject
-    public ApiClient(AuthInterceptor authInterceptor) {
+    public AuthApiClient(AuthInterceptor authInterceptor) {
 
         this.authInterceptor = authInterceptor;
         createDefaultAdapter();

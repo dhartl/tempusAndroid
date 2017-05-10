@@ -3,6 +3,7 @@ package at.c02.tempus.app;
 import android.app.Application;
 
 import at.c02.tempus.api.ApiModule;
+import at.c02.tempus.auth.AuthModule;
 import at.c02.tempus.db.DatabaseModule;
 import at.c02.tempus.service.ServiceModule;
 
@@ -21,6 +22,7 @@ public class TempusApplication extends Application {
         //intitialize dagger component to build the module and initialize DI
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
+                .authModule(new AuthModule())
                 .databaseModule(new DatabaseModule())
                 .apiModule(new ApiModule())
                 .serviceModule(new ServiceModule())

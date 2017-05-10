@@ -11,4 +11,15 @@
     <string name="activity_booking_new">Neue Buchung</string>
     <string name="delete">Löschen</string>
     <string name="sync">Synchronisieren</string>
+
+
+
+    <string name="openDrawer">open_drawer</string>
+    <string name="closeDrawer">close_drawer</string>
+
+    <!-- Navigation Drawer menu labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_sync">Synchronisieren</string>
+    <string name="nav_logout">Logout</string>
+
 </resources>
