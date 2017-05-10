@@ -48,7 +48,7 @@ public class EmployeeSyncService extends AbstractSyncService<EmployeeEntity> {
 
     @Override
     protected Observable<List<EmployeeEntity>> loadLegacyItems() {
-        return employeeApi.findEmployeeByUserName(currentUserHolder.getCurrentUser().getName())
+        return employeeApi.findEmployeeByUserName(currentUserHolder.getCurrentUser())
                 .map(EmployeeMapping::toEmployeeEntity)
                 .map(Collections::singletonList);
     }
@@ -61,7 +61,7 @@ public class EmployeeSyncService extends AbstractSyncService<EmployeeEntity> {
     @Override
     protected void publishResults() {
         eventBus.post(new EmployeeChangedEvent(
-                employeeRepository.findByUserName(currentUserHolder.getCurrentUser().getName())));
+                employeeRepository.findByUserName(currentUserHolder.getCurrentUser())));
     }
 
     @Override

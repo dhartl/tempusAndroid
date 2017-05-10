@@ -9,6 +9,7 @@ import org.greenrobot.eventbus.Subscribe;
 import at.c02.tempus.auth.api.AuthApi;
 import at.c02.tempus.auth.event.TokenEvent;
 import at.c02.tempus.auth.event.UserChangedEvent;
+import at.c02.tempus.auth.model.UserData;
 import at.c02.tempus.service.SyncService;
 
 /**
@@ -41,13 +42,14 @@ public class TokenChangeHandler {
 
     @Subscribe
     public void onTokenEvent(TokenEvent tokenEvent) {
-        authApi.getUserInfo().subscribe(userData -> {
-            String userName = userData.getName();
-            Log.d(TAG, "user loaded: " + userName);
-            currentUserHolder.setCurrentUser(userData);
-            eventBus.post(new UserChangedEvent(userName));
-            syncService.synchronize(context);
-        }, ex -> Log.e(TAG, "failed to load user", ex));
+        authApi.getUserInfo()
+                .map(UserData::getName)
+                .subscribe(userName -> {
+                    Log.d(TAG, "user loaded: " + userName);
+                    currentUserHolder.setCurrentUser(userName);
+                    eventBus.post(new UserChangedEvent(userName));
+                    syncService.synchronize(context);
+                }, ex -> Log.e(TAG, "failed to load user", ex));
 
     }
 

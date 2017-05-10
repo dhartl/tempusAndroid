@@ -33,8 +33,8 @@ public class AuthModule {
 
     @Provides
     @Singleton
-    public CurrentUserHolder provideCurrentUserHolder() {
-        return new CurrentUserHolder();
+    public CurrentUserHolder provideCurrentUserHolder(AuthStatePersister authStatePersister) {
+        return new CurrentUserHolder(authStatePersister);
     }
 
     @Provides

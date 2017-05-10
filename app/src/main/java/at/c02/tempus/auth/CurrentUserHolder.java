@@ -9,16 +9,20 @@ import at.c02.tempus.auth.model.UserData;
 
 public class CurrentUserHolder {
 
-    private UserData currentUser;
+    private final AuthStatePersister authStatePersister;
+    private String currentUser;
 
-    public CurrentUserHolder() {
+    public CurrentUserHolder(AuthStatePersister authStatePersister) {
+        this.authStatePersister= authStatePersister;
+        currentUser = authStatePersister.readUserName();
     }
 
-    public UserData getCurrentUser() {
+    public String getCurrentUser() {
         return currentUser;
     }
 
-    public void setCurrentUser(UserData currentUser) {
+    public void setCurrentUser(String currentUser) {
         this.currentUser = currentUser;
+        authStatePersister.writeUserName(currentUser);
     }
 }

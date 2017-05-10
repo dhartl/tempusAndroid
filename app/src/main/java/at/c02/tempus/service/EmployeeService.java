@@ -33,7 +33,7 @@ public class EmployeeService {
         return Observable.fromCallable(
                 () -> {
                     if (currentUserHolder.getCurrentUser() != null) {
-                        return Optional.of(employeeRepository.findByUserName(currentUserHolder.getCurrentUser().getName()));
+                        return Optional.of(employeeRepository.findByUserName(currentUserHolder.getCurrentUser()));
                     } else {
                         return Optional.absent();
                     }
