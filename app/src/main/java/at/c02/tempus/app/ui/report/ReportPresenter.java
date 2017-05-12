@@ -21,5 +21,6 @@ public class ReportPresenter extends Presenter<ReportActivity> {
 
 
     public void createReport() {
+      //  reportService.findBookings();
     }
 }
