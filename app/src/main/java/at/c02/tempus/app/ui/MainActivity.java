@@ -53,7 +53,6 @@ public class MainActivity extends NucleusAppCompatActivity<MainActivityPresenter
         // Navigation Drawer wie in http://www.androidhive.info/2013/11/android-sliding-menu-using-navigation-drawer/ beschrieben
         View navHeader = navigationView.getHeaderView(0);
         txtName = (TextView) navHeader.findViewById(R.id.name);
-        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
         imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
 
         setSupportActionBar(toolbar);
