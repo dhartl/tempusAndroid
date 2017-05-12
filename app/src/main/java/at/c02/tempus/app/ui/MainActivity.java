@@ -1,5 +1,6 @@
 package at.c02.tempus.app.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -14,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import at.c02.tempus.R;
+import at.c02.tempus.app.ui.bookinglist.BookingActivity;
+import at.c02.tempus.app.ui.report.ReportActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nucleus.factory.RequiresPresenter;
@@ -98,6 +101,10 @@ public class MainActivity extends NucleusAppCompatActivity<MainActivityPresenter
             //Check to see which item was being clicked and perform appropriate action
             switch (menuItem.getItemId()) {
                 //Replacing the main content with ContentFragment Which is our Inbox View;
+                case R.id.nav_report:
+                    Intent intent = new Intent(this, ReportActivity.class);
+                    startActivity(intent);
+                    break;
                 case R.id.nav_sync:
                     getPresenter().startSync();
                     break;

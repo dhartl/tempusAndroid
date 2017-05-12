@@ -8,6 +8,7 @@ import at.c02.tempus.app.ui.AuthPresenter;
 import at.c02.tempus.app.ui.MainActivityPresenter;
 import at.c02.tempus.app.ui.bookinglist.BookingActivityPresenter;
 import at.c02.tempus.app.ui.bookinglist.FragmentBookingListPresenter;
+import at.c02.tempus.app.ui.report.ReportPresenter;
 import at.c02.tempus.auth.AuthModule;
 import at.c02.tempus.db.DatabaseModule;
 import at.c02.tempus.service.ServiceModule;
@@ -24,4 +25,6 @@ public interface ApplicationComponent {
     void inject(FragmentBookingListPresenter fragmentBookingListPresenter);
 
     void inject(AuthPresenter authPresenter);
+
+    void inject(ReportPresenter reportPresenter);
 }

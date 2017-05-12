@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import at.c02.tempus.TempusConstants;
 import at.c02.tempus.auth.event.TokenEvent;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -33,7 +34,8 @@ import io.reactivex.subjects.ReplaySubject;
 
 public class AuthService {
 
-    private static final String AUTHORIZATION_SERVICE_ENDPOINT = "http://10.0.2.2:5000/.well-known/openid-configuration";
+    private static final String AUTHORIZATION_SERVICE_ENDPOINT = TempusConstants.ENDPOINT_IDENTITY + ".well-known/openid-configuration";
+    private static final String AUTHORIZATION_SERVICE_LOGOUT_URL = TempusConstants.ENDPOINT_IDENTITY + "Account/Logout";
     private static final String REDIRECT_URI = "at.c02.tempus:/oauth2redirect";
     private static final String CLIENT_ID = "tempusAndroid";
 
@@ -138,13 +140,10 @@ public class AuthService {
     public void logout(Context context) {
         authHolder.setAuthState(null);
         try {
-            String url = "http://10.0.2.2:5000/Account/Logout";
-
-            // Here is a method that returns the chrome package name
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.intent.setPackage("com.android.chrome");
-            customTabsIntent.launchUrl(context, Uri.parse(url));
+            customTabsIntent.launchUrl(context, Uri.parse(AUTHORIZATION_SERVICE_LOGOUT_URL));
 
         } catch (Exception ex) {
             Log.e(TAG, "Fehler beim revoken des Access-Tokens");
