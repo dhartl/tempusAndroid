@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import at.c02.tempus.TempusConstants;
 import at.c02.tempus.api.DateDeserializer;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -21,10 +22,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 @Singleton
 public class AuthApiClient {
-
-    // 10.0.2.2 ist ip von Localhost für den Emulator
-    // Wenn Handy verwendet wird, dann muss hier die Ip des PCs eingetragen werden!
-    public static final String BASE_URL = "http://10.0.2.2:5000/";
 
     private Map<String, Interceptor> apiAuthorizations;
     private OkHttpClient.Builder okBuilder;
@@ -56,7 +53,7 @@ public class AuthApiClient {
 
         adapterBuilder = new Retrofit
                 .Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(TempusConstants.ENDPOINT_IDENTITY)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson));
