@@ -30,8 +30,8 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     @Inject
     protected ProjectService projectService;
 
-    @Inject
-    protected EventBus eventBus;
+    //@Inject
+    //protected EventBus eventBus;
 
     private List<ProjectEntity> projects;
 
@@ -46,7 +46,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
-        eventBus.register(this);
+       // eventBus.register(this);
 
         projectService.getProjects()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -83,7 +83,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
 
     @Override
     protected void onDestroy() {
-        eventBus.unregister(this);
+        //eventBus.unregister(this);
         super.onDestroy();
     }
 
