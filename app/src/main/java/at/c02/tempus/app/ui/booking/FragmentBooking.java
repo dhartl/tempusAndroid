@@ -75,17 +75,57 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     }
 
     @OnClick(R.id.btnRecordButton)
-    public void onRecordClick()
-    {
-        if(getPresenter().getModel().getProject()!= null) {
+    public void onRecordClick() {
+        if (getPresenter().getModel().getProject() != null) {
             getPresenter().setBeginTime();
-        }
-        else
-        {
+        } else {
             //choose project
         }
 
     }
+
+    @OnClick(R.id.btnStopWatch)
+    protected void onRecordClick2() {
+
+       runnable = new Runnable() {
+           @Override
+           public void run() {
+               MillisecondTime = SystemClock.uptimeMillis() - StartTime;
+
+               UpdateTime = TimeBuff + MillisecondTime;
+
+               Seconds = (int) (UpdateTime / 1000);
+
+               Minutes = Seconds / 60;
+
+               Seconds = Seconds % 60;
+
+               MilliSeconds = (int) (UpdateTime % 1000);
+
+               textView.setText("" + Minutes + ":"
+                       + String.format("%02d", Seconds) + ":"
+                       + String.format("%03d", MilliSeconds));
+
+               handler.postDelayed(this, 0);
+           }
+       };
+       runnable.run();
+        StartTime = SystemClock.uptimeMillis();
+        handler.postDelayed(runnable, 0);
+
+
+        //do something...
+    }
+
+
+    public Runnable runnable = new Runnable() {
+
+        public void run() {
+
+
+        }
+    };
+
 
 
     public void timeCounter()
