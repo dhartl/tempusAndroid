@@ -1,14 +1,9 @@
 package at.c02.tempus.app.ui.booking;
 
 
-import at.c02.tempus.app.ui.bookinglist.BookingListItem;
-import eu.davidea.flexibleadapter.FlexibleAdapter;
 import nucleus.factory.RequiresPresenter;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +33,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     @BindView(R.id.btnRecordButton)
     protected Button btnRecordButton;
 
-    private ArrayAdapter<ProjectEntity> adapter;
+   private ArrayAdapter<ProjectEntity> adapter;
 
 
     @Nullable
@@ -46,6 +41,19 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
         ButterKnife.bind(this,root);
+       adapter = new ArrayAdapter<>(this.getContext(), R.layout.support_simple_spinner_dropdown_item);
+       cbProject.setAdapter(adapter);
+       cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+          @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+          getPresenter().setProject(adapter.getItem(position));
+      }
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+        getPresenter().setProject(null);
+      }
+      });
+
         return root;
     }
 

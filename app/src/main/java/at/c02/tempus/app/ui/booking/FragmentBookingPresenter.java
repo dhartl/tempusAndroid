@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -13,6 +15,7 @@ import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import at.c02.tempus.service.BookingService;
 import at.c02.tempus.service.ProjectService;
+import at.c02.tempus.service.event.ProjectsChangedEvent;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 /**
@@ -30,8 +33,8 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     @Inject
     protected ProjectService projectService;
 
-    //@Inject
-    //protected EventBus eventBus;
+    @Inject
+    protected EventBus eventBus;
 
     private List<ProjectEntity> projects;
 
@@ -46,7 +49,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     @Override
     protected void onCreate(@Nullable Bundle savedState) {
         super.onCreate(savedState);
-       // eventBus.register(this);
+        eventBus.register(this);
 
         projectService.getProjects()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -69,8 +72,11 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
             }
         }
     }
-
-
+    public void setProject(ProjectEntity project) {
+        if (model != null) {
+            model.setProject(project);
+        }
+    }
 
     public BookingEntity getModel() {
         return model;
@@ -83,7 +89,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
 
     @Override
     protected void onDestroy() {
-        //eventBus.unregister(this);
+        eventBus.unregister(this);
         super.onDestroy();
     }
 
@@ -94,4 +100,10 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         }
     }
 
+
+    @Subscribe
+    public void onProjectsChange(ProjectsChangedEvent event) {
+        this.projects = event.getProjects();
+        publishProjects();
+    }
 }
