@@ -65,8 +65,8 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
 
     public void updateProjects(List<ProjectEntity> projects) {
-       // adapter.clear();
-        //adapter.addAll(projects);
+        adapter.clear();
+        adapter.addAll(projects);
     }
     public void onError(Throwable error) {
         Toast.makeText(this.getContext(), error.getMessage(), Toast.LENGTH_LONG).show();

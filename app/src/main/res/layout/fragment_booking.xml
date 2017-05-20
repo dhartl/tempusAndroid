@@ -40,4 +40,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/min_height_48"
         android:text="START" />
+
+    <Button
+        android:id="@+id/btnStopWatch"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/min_height_48"
+        android:text="Stopwatch" />
 </LinearLayout>

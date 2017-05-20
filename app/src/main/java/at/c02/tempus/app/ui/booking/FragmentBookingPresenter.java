@@ -2,6 +2,7 @@ package at.c02.tempus.app.ui.booking;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.widget.ArrayAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -40,6 +41,9 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
 
     //necessary?
     private Throwable error;
+
+    private ArrayAdapter<ProjectEntity> adapter;
+
 
     public FragmentBookingPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
