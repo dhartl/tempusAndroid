@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -123,21 +124,27 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         publishProjects();
     }
 
-    public void setBeginTime()
+    public void createNewBookingEntity()
     {
         Date startDate = new Date();
         model.setBeginDate(startDate);
+
+        Calendar cal = Calendar.getInstance(); // creates calendar
+        cal.setTime(new Date()); // sets calendar time/date
+        cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
+
+        model.setEndDate(cal.getTime() );
 
         saveBookingStart();
     }
 
     public void saveBookingStart() {
-        bookingService.createNewBooking()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    this.model = result;
-                }, error -> {
-                    this.error = error;
-                });
+        boolean valid = validate(model);
+        if (valid) {
+            model = bookingService.createOrUpdateBooking(model);
+            getView().onSaveSuccessful(model);
+        } else {
+            getView().onError(error);
+        }
     }
 }

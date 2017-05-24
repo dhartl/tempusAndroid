@@ -77,7 +77,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     @OnClick(R.id.btnRecordButton)
     public void onRecordClick() {
         if (getPresenter().getModel().getProject() != null) {
-            getPresenter().setBeginTime();
+            getPresenter().createNewBookingEntity();
+
+
         } else {
             //choose project
         }
@@ -137,16 +139,14 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
-                String.format("Die Buchung %s: %s - %s wurde gespeichert",
-                        projectName,
-                        dateTimeFormat.format(model.getBeginDate()),
-                        dateTimeFormat.format(model.getEndDate())),
+                String.format("Die Aufzeichnung der Buchung %s hat begonnen!",
+                        projectName),
                 Toast.LENGTH_SHORT)
                 .show();
 
         //TODO:
         // this.getActivity().setResult(RESULT_OK);
-        this.getActivity().finish();
+
     }
 
     public void updateProjects(List<ProjectEntity> projects) {
