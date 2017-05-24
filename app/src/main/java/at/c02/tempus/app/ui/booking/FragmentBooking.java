@@ -1,6 +1,8 @@
 package at.c02.tempus.app.ui.booking;
 
 
+import at.c02.tempus.db.entity.BookingEntity;
+import at.c02.tempus.utils.DateUtils;
 import nucleus.factory.RequiresPresenter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.text.DateFormat;
 import java.util.List;
 import at.c02.tempus.R;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -40,9 +44,6 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     protected TextView textView;
 
     private ArrayAdapter<ProjectEntity> adapter;
-    @Text
-
-   private ArrayAdapter<ProjectEntity> adapter;
 
     //Stopwatch
     long StartTime, MillisecondTime, TimeBuff, UpdateTime = 0L;
