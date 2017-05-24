@@ -1,7 +1,11 @@
 package at.c02.tempus.app.ui.booking;
 
 
+import at.c02.tempus.db.entity.BookingEntity;
+import at.c02.tempus.utils.DateUtils;
 import nucleus.factory.RequiresPresenter;
+
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -12,6 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import at.c02.tempus.R;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -32,6 +40,8 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
     @BindView(R.id.btnRecordButton)
     protected Button btnRecordButton;
+
+    @Text
 
    private ArrayAdapter<ProjectEntity> adapter;
 
@@ -58,11 +68,39 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     }
 
     @OnClick(R.id.btnRecordButton)
-    protected  void onRecordClick()
+    public void onRecordClick()
     {
-        //do something...
+        if(getPresenter().getModel().getProject()!= null) {
+            getPresenter().setBeginTime();
+        }
+        else
+        {
+            //choose project
+        }
+
     }
 
+
+    public void timeCounter()
+    {
+
+    }
+
+    public void onSaveSuccessful(BookingEntity model) {
+        DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
+        String projectName = model.getProject() != null ? model.getProject().getName() : "";
+        Toast.makeText(this.getContext(),
+                String.format("Die Buchung %s: %s - %s wurde gespeichert",
+                        projectName,
+                        dateTimeFormat.format(model.getBeginDate()),
+                        dateTimeFormat.format(model.getEndDate())),
+                Toast.LENGTH_SHORT)
+                .show();
+
+        //TODO:
+        // this.getActivity().setResult(RESULT_OK);
+        this.getActivity().finish();
+    }
 
     public void updateProjects(List<ProjectEntity> projects) {
         adapter.clear();

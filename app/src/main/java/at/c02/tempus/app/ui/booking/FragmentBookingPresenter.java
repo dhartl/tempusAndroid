@@ -10,7 +10,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.List;
 
 import javax.inject.Inject;
-
+import java.util.Date;
 import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -67,6 +67,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
                 );
     }
 
+
     private void publishProjects() {
         if (getView() != null) {
             if (projects != null) {
@@ -76,6 +77,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
             }
         }
     }
+
     public void setProject(ProjectEntity project) {
         if (model != null) {
             model.setProject(project);
@@ -104,10 +106,38 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         }
     }
 
+    private boolean validate(BookingEntity model) {
+        boolean successful = false;
+        try {
+            bookingService.validateBooking(model);
+            successful = true;
+        } catch (RuntimeException ex) {
+            error = ex;
+        }
+        return successful;
+    }
 
     @Subscribe
     public void onProjectsChange(ProjectsChangedEvent event) {
         this.projects = event.getProjects();
         publishProjects();
+    }
+
+    public void setBeginTime()
+    {
+        Date startDate = new Date();
+        model.setBeginDate(startDate);
+
+        saveBookingStart();
+    }
+
+    public void saveBookingStart() {
+        bookingService.createNewBooking()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    this.model = result;
+                }, error -> {
+                    this.error = error;
+                });
     }
 }
