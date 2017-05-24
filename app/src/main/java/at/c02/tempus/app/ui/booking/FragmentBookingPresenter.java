@@ -123,6 +123,14 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         this.projects = event.getProjects();
         publishProjects();
     }
+    public void saveRecordedBooking()
+    {
+        Date endDate = new Date();
+        model.setEndDate(endDate);
+
+        saveBooking();
+    }
+
 
     public void createNewBookingEntity()
     {
@@ -135,10 +143,19 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
 
         model.setEndDate(cal.getTime() );
 
-        saveBookingStart();
+        createBooking();
     }
 
-    public void saveBookingStart() {
+    public void createBooking() {
+        boolean valid = validate(model);
+        if (valid) {
+            model = bookingService.createOrUpdateBooking(model);
+            getView().onCreateSuccessful(model);
+        } else {
+            getView().onError(error);
+        }
+    }
+    public void saveBooking() {
         boolean valid = validate(model);
         if (valid) {
             model = bookingService.createOrUpdateBooking(model);
@@ -147,4 +164,6 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
             getView().onError(error);
         }
     }
+
+  
 }

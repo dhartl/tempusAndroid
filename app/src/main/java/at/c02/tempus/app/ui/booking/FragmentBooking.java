@@ -4,6 +4,8 @@ package at.c02.tempus.app.ui.booking;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.utils.DateUtils;
 import nucleus.factory.RequiresPresenter;
+
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -50,12 +52,15 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     Handler handler;
     int Seconds, Minutes, MilliSeconds;
 
+   public boolean Record_Active;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
         ButterKnife.bind(this, root);
+        Record_Active = false;
+
        handler = new Handler();
         adapter = new ArrayAdapter<>(this.getContext(), R.layout.support_simple_spinner_dropdown_item);
         cbProject.setAdapter(adapter);
@@ -75,7 +80,22 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     }
 
     @OnClick(R.id.btnRecordButton)
-    public void onRecordClick() {
+    public void onRecordClick()  {
+        if(Record_Active)
+        {
+            onRecordClick2();
+            this.btnRecordButton.setBackgroundColor(Color.GREEN);
+            this.btnRecordButton.setText("START");
+            getPresenter().saveRecordedBooking();
+            Record_Active = false;
+
+        }
+
+        else{
+          onRecordClick2();
+            Record_Active = true;
+        btnRecordButton.setBackgroundColor(Color.RED);
+        btnRecordButton.setText("STOP");
         if (getPresenter().getModel().getProject() != null) {
             getPresenter().createNewBookingEntity();
 
@@ -83,40 +103,51 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         } else {
             //choose project
         }
-
+        }
     }
 
-    @OnClick(R.id.btnStopWatch)
-    protected void onRecordClick2() {
+   public void onRecordClick2()  {
 
-       runnable = new Runnable() {
-           @Override
-           public void run() {
-               MillisecondTime = SystemClock.uptimeMillis() - StartTime;
+        if(!Record_Active) {
 
-               UpdateTime = TimeBuff + MillisecondTime;
+            runnable = new Runnable() {
 
-               Seconds = (int) (UpdateTime / 1000);
+                @Override
+                public void run() {
+                    MillisecondTime = SystemClock.uptimeMillis() - StartTime;
 
-               Minutes = Seconds / 60;
+                    UpdateTime = TimeBuff + MillisecondTime;
 
-               Seconds = Seconds % 60;
+                    Seconds = (int) (UpdateTime / 1000);
 
-               MilliSeconds = (int) (UpdateTime % 1000);
+                    Minutes = Seconds / 60;
 
-               textView.setText("" + Minutes + ":"
-                       + String.format("%02d", Seconds) + ":"
-                       + String.format("%03d", MilliSeconds));
+                    Seconds = Seconds % 60;
 
-               handler.postDelayed(this, 0);
-           }
-       };
-       runnable.run();
-        StartTime = SystemClock.uptimeMillis();
-        handler.postDelayed(runnable, 0);
+                    MilliSeconds = (int) (UpdateTime % 1000);
 
+                    textView.setText("" + Minutes + ":"
+                            + String.format("%02d", Seconds) + ":"
+                            + String.format("%03d", MilliSeconds));
 
-        //do something...
+                    handler.postDelayed(this, 0);
+                }
+            };
+            runnable.run();
+            StartTime = SystemClock.uptimeMillis();
+            handler.postDelayed(runnable, 0);
+        }
+        else
+        {
+          onStop();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Record_Active = false;
+        handler.removeCallbacks(runnable);
     }
 
 
@@ -135,7 +166,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
     }
 
-    public void onSaveSuccessful(BookingEntity model) {
+    public void onCreateSuccessful(BookingEntity model) {
         DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
@@ -148,6 +179,21 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         // this.getActivity().setResult(RESULT_OK);
 
     }
+
+    public void onSaveSuccessful(BookingEntity model) {
+        DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
+        String projectName = model.getProject() != null ? model.getProject().getName() : "";
+        Toast.makeText(this.getContext(),
+                String.format("Die Buchung %s wurde gespeichert!",
+                        projectName),
+                Toast.LENGTH_SHORT)
+                .show();
+
+        //TODO:
+        // this.getActivity().setResult(RESULT_OK);
+
+    }
+
 
     public void updateProjects(List<ProjectEntity> projects) {
         adapter.clear();
