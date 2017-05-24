@@ -1,11 +1,7 @@
 package at.c02.tempus.app.ui.booking;
 
 
-import at.c02.tempus.db.entity.BookingEntity;
-import at.c02.tempus.utils.DateUtils;
 import nucleus.factory.RequiresPresenter;
-
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,10 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import at.c02.tempus.R;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -27,6 +19,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nucleus.view.NucleusSupportFragment;
+import android.os.SystemClock;
+import android.os.Handler;
+import android.widget.TextView;
 
 
 /**
@@ -41,28 +36,39 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     @BindView(R.id.btnRecordButton)
     protected Button btnRecordButton;
 
+    @BindView(R.id.textView)
+    protected TextView textView;
+
+    private ArrayAdapter<ProjectEntity> adapter;
     @Text
 
    private ArrayAdapter<ProjectEntity> adapter;
+
+    //Stopwatch
+    long StartTime, MillisecondTime, TimeBuff, UpdateTime = 0L;
+    Handler handler;
+    int Seconds, Minutes, MilliSeconds;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_booking, container, false);
-        ButterKnife.bind(this,root);
-       adapter = new ArrayAdapter<>(this.getContext(), R.layout.support_simple_spinner_dropdown_item);
-       cbProject.setAdapter(adapter);
-       cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-          @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-          getPresenter().setProject(adapter.getItem(position));
-      }
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-        getPresenter().setProject(null);
-      }
-      });
+        ButterKnife.bind(this, root);
+       handler = new Handler();
+        adapter = new ArrayAdapter<>(this.getContext(), R.layout.support_simple_spinner_dropdown_item);
+        cbProject.setAdapter(adapter);
+        cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                getPresenter().setProject(adapter.getItem(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                getPresenter().setProject(null);
+            }
+        });
 
         return root;
     }
