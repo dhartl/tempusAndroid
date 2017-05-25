@@ -1,10 +1,6 @@
 package at.c02.tempus.app.ui.booking;
-
-
 import at.c02.tempus.db.entity.BookingEntity;
-import at.c02.tempus.utils.DateUtils;
 import nucleus.factory.RequiresPresenter;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,8 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import java.text.DateFormat;
 import java.util.List;
 import at.c02.tempus.R;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -101,7 +95,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
 
         } else {
-            //choose project
+                //choose project
         }
         }
     }
@@ -151,47 +145,24 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     }
 
 
-    public Runnable runnable = new Runnable() {
-
-        public void run() {
-
-
-        }
-    };
-
-
-
-    public void timeCounter()
-    {
-
-    }
+    public Runnable runnable;
 
     public void onCreateSuccessful(BookingEntity model) {
-        DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
                 String.format("Die Aufzeichnung der Buchung %s hat begonnen!",
                         projectName),
                 Toast.LENGTH_SHORT)
                 .show();
-
-        //TODO:
-        // this.getActivity().setResult(RESULT_OK);
-
     }
 
     public void onSaveSuccessful(BookingEntity model) {
-        DateFormat dateTimeFormat = DateUtils.getDateTimeFormat();
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
                 String.format("Die Buchung %s wurde gespeichert!",
                         projectName),
                 Toast.LENGTH_SHORT)
                 .show();
-
-        //TODO:
-        // this.getActivity().setResult(RESULT_OK);
-
     }
 
 

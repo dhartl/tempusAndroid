@@ -43,9 +43,6 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     //necessary?
     private Throwable error;
 
-    private ArrayAdapter<ProjectEntity> adapter;
-
-
     public FragmentBookingPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
     }
@@ -100,12 +97,6 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         super.onDestroy();
     }
 
-    private void onError(Throwable error) {
-        this.error = error;
-        if (getView() != null) {
-            getView().onError(error);
-        }
-    }
 
     private boolean validate(BookingEntity model) {
         boolean successful = false;
