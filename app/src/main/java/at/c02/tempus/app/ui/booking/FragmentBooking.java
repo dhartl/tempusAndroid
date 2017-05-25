@@ -84,7 +84,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         if(Record_Active)
         {
             onRecordClick2();
-            this.btnRecordButton.setBackgroundColor(Color.GREEN);
+            this.btnRecordButton.setBackgroundColor(Color.rgb(180,243,184));
             this.btnRecordButton.setText("START");
             getPresenter().saveRecordedBooking();
             Record_Active = false;

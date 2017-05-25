@@ -6,17 +6,25 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tempus Quick Record
-        Please choose a project and press the START Button" />
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:text="Choose a project and press START"
+        android:textColor="@android:color/background_dark"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
 
     <Spinner
         android:id="@+id/cbProject"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@android:layout/simple_list_item_1"/>
+        android:layout_marginTop="30dp"
+        android:dropDownWidth="match_parent"
+        android:padding="2dp"
+        android:textStyle="bold"
+        tools:listitem="@android:layout/simple_list_item_1" />
 
 
     <TextView
@@ -35,11 +43,20 @@
 
     <Button
         android:id="@+id/btnRecordButton"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="70dp"
+        android:layout_marginRight="70dp"
         android:layout_marginTop="@dimen/min_height_48"
-        android:text="START" />
+        android:text="START"
+        android:background="#C5EEC7"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textStyle="bold"
+
+
+        />
+
 
 
 </LinearLayout>
