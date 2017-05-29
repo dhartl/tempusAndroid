@@ -6,11 +6,12 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/tvHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
-        android:text="Choose a project and press START"
+        android:text="Wähle ein Projekt und drücke START"
         android:textColor="@android:color/background_dark"
         android:textSize="20dp"
         android:textStyle="bold" />

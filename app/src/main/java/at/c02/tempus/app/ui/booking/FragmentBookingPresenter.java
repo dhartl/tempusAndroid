@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import java.util.Date;
+
+import at.c02.tempus.api.model.Project;
 import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -138,8 +140,9 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     }
 
     public void createBooking() {
-        boolean valid = validate(model);
-        if (valid) {
+        //boolean valid = validate(model);
+       if(model.getProject() != null && model.getBeginDate() != null)
+       {
             model = bookingService.createOrUpdateBooking(model);
             getView().onCreateSuccessful(model);
         } else {
@@ -150,7 +153,11 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         boolean valid = validate(model);
         if (valid) {
             model = bookingService.createOrUpdateBooking(model);
+
             getView().onSaveSuccessful(model);
+            ProjectEntity tempProject = model.getProject();
+            this.model = new BookingEntity();
+            model.setProject(tempProject);
         } else {
             getView().onError(error);
         }

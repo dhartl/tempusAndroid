@@ -33,6 +33,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     @BindView(R.id.cbProject)
     protected Spinner cbProject;
 
+    @BindView(R.id.tvHeading)
+    protected TextView tvHeading;
+
     @BindView(R.id.btnRecordButton)
     protected Button btnRecordButton;
 
@@ -77,6 +80,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     public void onRecordClick()  {
         if(Record_Active)
         {
+            tvHeading.setText("Wähle ein Projekt und drücke START");
             onRecordClick2();
             this.btnRecordButton.setBackgroundColor(Color.rgb(180,243,184));
             this.btnRecordButton.setText("START");
@@ -86,8 +90,10 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         }
 
         else{
+
           onRecordClick2();
             Record_Active = true;
+            tvHeading.setText("Drücke STOP wenn du fertig bist!");
         btnRecordButton.setBackgroundColor(Color.RED);
         btnRecordButton.setText("STOP");
         if (getPresenter().getModel().getProject() != null) {
@@ -134,6 +140,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         else
         {
           onStop();
+            textView.setText("" + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
         }
     }
 
