@@ -34,11 +34,14 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
     @BindView(R.id.btnDateStart)
     protected Button btnDateStart;
 
-    /*
+
     @BindView(R.id.recyclerView)
     protected  RecyclerView recyclerView;
-    */
 
+/*
+    @OnClick(R.id.btnreport)
+    protected void onBtnSearchClick() { getPresenter().onTakeView(onBtnDateStartClick());}
+*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +69,14 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
                 calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
         datePickerDialog.show();
+
     }
 
-    /*
+
     public void showItems(List<BookingEntity> bookings) {
         List<BookingListItem> listItems = new ArrayList<>();
         for (BookingEntity booking : bookings) {
+            //if --> starDate
             String projectName = booking.getProject() != null ? booking.getProject().getName() : "";
             listItems.add(new BookingListItem(booking.getId(),
                     projectName,
@@ -82,7 +87,7 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
 
 
     }
-*/
+
 
 
     public void updateStartDate(Date startDate) {

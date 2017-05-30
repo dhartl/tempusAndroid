@@ -3,9 +3,12 @@
     <string name="fragment_booking_title">Quickrecord</string>
     <string name="fragment_booking_list_title">Time Manager</string>
     <string name="save">Speichern</string>
+    <string name="ReportText">Auswertung</string>
+    <string name="search">Suchen</string>
     <string name="cancel">Abbrechen</string>
     <string name="project_subheading">Projekt</string>
     <string name="start_datetime_subheading">Start</string>
+    <string name="ReportStartDate">Startdatum</string>
     <string name="end_datetime_subheading">Ende</string>
     <string name="activity_booking_edit">Buchung bearbeiten</string>
     <string name="activity_booking_new">Neue Buchung</string>
