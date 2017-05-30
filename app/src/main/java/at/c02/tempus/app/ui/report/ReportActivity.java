@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nucleus.factory.RequiresPresenter;
 import nucleus.view.NucleusAppCompatActivity;
+import eu.davidea.flexibleadapter.FlexibleAdapter;
 
 
 @RequiresPresenter(ReportPresenter.class)
@@ -35,13 +36,14 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
     protected Button btnDateStart;
 
 
+    @BindView(R.id.btnreport)
+    protected Button btnreport;
+
     @BindView(R.id.recyclerView)
     protected  RecyclerView recyclerView;
 
-/*
-    @OnClick(R.id.btnreport)
-    protected void onBtnSearchClick() { getPresenter().onTakeView(onBtnDateStartClick());}
-*/
+    FlexibleAdapter<BookingListItem> adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,10 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
         setSupportActionBar(toolbar);
 
     }
+
+    @OnClick(R.id.btnreport)
+    protected void onBtnreportClick() { getPresenter().createReport();}
+
 
     @OnClick(R.id.btnDateStart)
     protected void onBtnDateStartClick() {
@@ -83,8 +89,14 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
                     booking.getBeginDate(),
                     booking.getEndDate()));
         }
-        Log.d("CREATION",listItems.toString());
+        if (adapter == null) {
+            adapter = new FlexibleAdapter<>(listItems);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.updateDataSet(listItems);
+        }
 
+       // Log.d("CREATION",listItems.toString());
 
     }
 
