@@ -6,15 +6,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import at.c02.tempus.app.TempusApplication;
+import at.c02.tempus.app.ui.bookinglist.BookingActivity;
 import at.c02.tempus.app.ui.bookinglist.FragmentBookingList;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.service.ReportService;
 import at.c02.tempus.utils.DateUtils;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
 
-/**
- * Created by Daniel Hartl on 12.05.2017.
- */
+
 
 public class ReportPresenter extends Presenter<ReportActivity> {
 
@@ -23,7 +23,9 @@ public class ReportPresenter extends Presenter<ReportActivity> {
 
     private BookingEntity model = new BookingEntity();
 
-    //private List<BookingEntity> bookings;
+   // private List<BookingEntity> bookings;
+
+    private Date searchDate;
 
     public ReportPresenter() {
         TempusApplication.getApp().getApplicationComponents().inject(this);
@@ -31,7 +33,7 @@ public class ReportPresenter extends Presenter<ReportActivity> {
 
 
     public void createReport() {
-      //  reportService.findBookings();
+      reportService.findBookings(searchDate);
     }
 
 
@@ -46,13 +48,28 @@ public class ReportPresenter extends Presenter<ReportActivity> {
     public void setStartDate(int year, int month, int day) {
         Date newBeginDate = DateUtils.setDate(model.getBeginDate(), year, month, day);
         model.setBeginDate(newBeginDate);
+        searchDate = newBeginDate;
     }
-/*
+
+
+    private void publishStartDate() {
+        if (getView() != null) {
+            if (model != null) {
+                getView().updateStartDate(model.getBeginDate());
+            } else {
+                getView().updateStartDate(null);
+            }
+        }
+    }
+
+
+    /*
+
     @Override
     protected void onTakeView(ReportActivity reportActivity) {
-        super.onTakeView(reportActivity);
-        if (bookings != null) {
-            getView().showItems(bookings);
+            if (bookings != null) {
+                getView().showItems(bookings);
+            }
         }
-    }*/
+*/
 }

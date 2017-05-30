@@ -2,6 +2,7 @@ package at.c02.tempus.app.ui.report;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,9 +24,7 @@ import butterknife.OnClick;
 import nucleus.factory.RequiresPresenter;
 import nucleus.view.NucleusAppCompatActivity;
 
-/**
- * Created by Daniel Hartl on 12.05.2017.
- */
+
 @RequiresPresenter(ReportPresenter.class)
 public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
 
@@ -34,6 +33,11 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
 
     @BindView(R.id.btnDateStart)
     protected Button btnDateStart;
+
+    /*
+    @BindView(R.id.recyclerView)
+    protected  RecyclerView recyclerView;
+    */
 
 
     @Override
@@ -44,6 +48,7 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+
     }
 
     @OnClick(R.id.btnDateStart)
@@ -63,6 +68,7 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
         datePickerDialog.show();
     }
 
+    /*
     public void showItems(List<BookingEntity> bookings) {
         List<BookingListItem> listItems = new ArrayList<>();
         for (BookingEntity booking : bookings) {
@@ -75,5 +81,22 @@ public class ReportActivity extends NucleusAppCompatActivity<ReportPresenter> {
         Log.d("CREATION",listItems.toString());
 
 
+    }
+*/
+
+
+    public void updateStartDate(Date startDate) {
+        updateDateTimeButtonText(startDate, btnDateStart, "Start");
+    }
+
+    protected void updateDateTimeButtonText(Date date, Button btnDate, String preText) {
+        String dateText;
+
+        if (date == null) {
+            dateText = preText + "datum";
+        } else {
+            dateText = DateUtils.getDateFormat().format(date);
+        }
+        btnDate.setText(dateText);
     }
 }
