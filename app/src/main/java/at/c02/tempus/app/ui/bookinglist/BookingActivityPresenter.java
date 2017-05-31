@@ -175,7 +175,7 @@ public class BookingActivityPresenter extends Presenter<BookingActivity> {
     private boolean validate(BookingEntity model) {
         boolean successful = false;
         try {
-            bookingService.validateBooking(model);
+            bookingService.validateBooking(model, true);
             successful = true;
         } catch (RuntimeException ex) {
             error = ex;

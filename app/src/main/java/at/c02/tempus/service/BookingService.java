@@ -66,17 +66,17 @@ public class BookingService {
         eventBus.post(new BookingChangedEvent(booking));
     }
 
-    public void validateBooking(BookingEntity model) throws RuntimeException {
+    public void validateBooking(BookingEntity model, boolean booking_completed) throws RuntimeException {
         if (model.getProjectId() == null) {
             throw new RuntimeException("Es muss ein Projekt ausgewählt werden!");
         }
         if (model.getBeginDate() == null) {
             throw new RuntimeException("Es muss ein Startdatum ausgewählt werden!");
         }
-        if (model.getEndDate() == null) {
+        if ((model.getEndDate() == null) && booking_completed) {
             throw new RuntimeException("Es muss ein Enddatum ausgewählt werden!");
         }
-        if (!model.getEndDate().after(model.getBeginDate())) {
+        if ((!model.getEndDate().after(model.getBeginDate())&& booking_completed)) {
             throw new RuntimeException("Das Enddaum muss nach dem Startdatum sein!");
         }
         //TODO: überschneidende Buchungszeiten

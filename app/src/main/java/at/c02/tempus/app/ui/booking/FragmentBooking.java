@@ -47,7 +47,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     //Stopwatch
     long StartTime, MillisecondTime, TimeBuff, UpdateTime = 0L;
     Handler handler;
-    int Seconds, Minutes, MilliSeconds;
+    int Seconds, Minutes, MilliSeconds,Hours;
 
    public boolean Record_Active;
 
@@ -122,11 +122,13 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
                     Minutes = Seconds / 60;
 
+                    Hours = Minutes / 60;
+
                     Seconds = Seconds % 60;
 
                     MilliSeconds = (int) (UpdateTime % 1000);
 
-                    textView.setText("" + Minutes + ":"
+                    textView.setText("" + Hours + ":" + Minutes + ":"
                             + String.format("%02d", Seconds) + ":"
                             + String.format("%03d", MilliSeconds));
 
@@ -140,7 +142,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         else
         {
           onStop();
-            textView.setText("" + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
+            textView.setText(""  + String.format("%01d",0) + ":"  + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
         }
     }
 

@@ -103,7 +103,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     private boolean validate(BookingEntity model) {
         boolean successful = false;
         try {
-            bookingService.validateBooking(model);
+            bookingService.validateBooking(model,false);
             successful = true;
         } catch (RuntimeException ex) {
             error = ex;
