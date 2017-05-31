@@ -96,7 +96,8 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
 
     //charts
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    //compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.0.9'
 
     compile 'eu.davidea:flexible-adapter:5.0.0-rc1'
     compile 'com.fernandocejas:arrow:1.0.0'
@@ -106,8 +107,11 @@ dependencies {
 
     annotationProcessor 'com.google.dagger:dagger-compiler:2.4'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+
 }
 
 greendao {
     schemaVersion 1
 }
+
+
