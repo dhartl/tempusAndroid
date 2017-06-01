@@ -1,8 +1,9 @@
 package at.c02.tempus.app.ui.booking;
-import at.c02.tempus.db.entity.BookingEntity;
-import nucleus.factory.RequiresPresenter;
+
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,17 +12,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.List;
+
 import at.c02.tempus.R;
+import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import nucleus.factory.RequiresPresenter;
 import nucleus.view.NucleusSupportFragment;
-import android.os.SystemClock;
-import android.os.Handler;
-import android.widget.TextView;
 
 
 /**
@@ -47,9 +50,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     //Stopwatch
     long StartTime, MillisecondTime, TimeBuff, UpdateTime = 0L;
     Handler handler;
-    int Seconds, Minutes, MilliSeconds,Hours;
+    int Seconds, Minutes, MilliSeconds, Hours;
 
-   public boolean Record_Active;
+    public boolean Record_Active;
 
     @Nullable
     @Override
@@ -58,7 +61,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         ButterKnife.bind(this, root);
         Record_Active = false;
 
-       handler = new Handler();
+        handler = new Handler();
         adapter = new ArrayAdapter<>(this.getContext(), R.layout.support_simple_spinner_dropdown_item);
         cbProject.setAdapter(adapter);
         cbProject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -77,38 +80,35 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     }
 
     @OnClick(R.id.btnRecordButton)
-    public void onRecordClick()  {
-        if(Record_Active)
-        {
+    public void onRecordClick() {
+        if (Record_Active) {
             tvHeading.setText("Wähle ein Projekt und drücke START");
             onRecordClick2();
-            this.btnRecordButton.setBackgroundColor(Color.rgb(180,243,184));
+            this.btnRecordButton.setBackgroundColor(Color.rgb(180, 243, 184));
             this.btnRecordButton.setText("START");
             getPresenter().saveRecordedBooking();
             Record_Active = false;
 
-        }
+        } else {
 
-        else{
-
-          onRecordClick2();
+            onRecordClick2();
             Record_Active = true;
             tvHeading.setText("Drücke STOP wenn du fertig bist!");
-        btnRecordButton.setBackgroundColor(Color.RED);
-        btnRecordButton.setText("STOP");
-        if (getPresenter().getModel().getProject() != null) {
-            getPresenter().createNewBookingEntity();
+            btnRecordButton.setBackgroundColor(Color.RED);
+            btnRecordButton.setText("STOP");
+            if (getPresenter().getModel().getProject() != null) {
+                getPresenter().createNewBookingEntity();
 
 
-        } else {
+            } else {
                 //choose project
-        }
+            }
         }
     }
 
-   public void onRecordClick2()  {
+    public void onRecordClick2() {
 
-        if(!Record_Active) {
+        if (!Record_Active) {
 
             runnable = new Runnable() {
 
@@ -138,11 +138,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
             runnable.run();
             StartTime = SystemClock.uptimeMillis();
             handler.postDelayed(runnable, 0);
-        }
-        else
-        {
-          onStop();
-            textView.setText(""  + String.format("%01d",0) + ":"  + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
+        } else {
+            onStop();
+            textView.setText("" + String.format("%01d", 0) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
         }
     }
 
@@ -179,6 +177,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
         adapter.clear();
         adapter.addAll(projects);
     }
+
     public void onError(Throwable error) {
         Toast.makeText(this.getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
     }

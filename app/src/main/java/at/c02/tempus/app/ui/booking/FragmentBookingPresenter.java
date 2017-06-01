@@ -2,18 +2,16 @@ package at.c02.tempus.app.ui.booking;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.widget.ArrayAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-import java.util.Date;
 
-import at.c02.tempus.api.model.Project;
 import at.c02.tempus.app.TempusApplication;
 import at.c02.tempus.db.entity.BookingEntity;
 import at.c02.tempus.db.entity.ProjectEntity;
@@ -22,6 +20,7 @@ import at.c02.tempus.service.ProjectService;
 import at.c02.tempus.service.event.ProjectsChangedEvent;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import nucleus.presenter.Presenter;
+
 /**
  * Created by Daniel Hartl on 13.04.2017.
  * Modified by Philipp^2
@@ -103,7 +102,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     private boolean validate(BookingEntity model) {
         boolean successful = false;
         try {
-            bookingService.validateBooking(model,false);
+            bookingService.validateBooking(model, false);
             successful = true;
         } catch (RuntimeException ex) {
             error = ex;
@@ -116,8 +115,8 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         this.projects = event.getProjects();
         publishProjects();
     }
-    public void saveRecordedBooking()
-    {
+
+    public void saveRecordedBooking() {
         Date endDate = new Date();
         model.setEndDate(endDate);
 
@@ -125,8 +124,7 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
     }
 
 
-    public void createNewBookingEntity()
-    {
+    public void createNewBookingEntity() {
         Date startDate = new Date();
         model.setBeginDate(startDate);
 
@@ -134,21 +132,21 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         cal.setTime(new Date()); // sets calendar time/date
         cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
 
-        model.setEndDate(cal.getTime() );
+        model.setEndDate(cal.getTime());
 
         createBooking();
     }
 
     public void createBooking() {
         //boolean valid = validate(model);
-       if(model.getProject() != null && model.getBeginDate() != null)
-       {
+        if (model.getProject() != null && model.getBeginDate() != null) {
             model = bookingService.createOrUpdateBooking(model);
             getView().onCreateSuccessful(model);
         } else {
             getView().onError(error);
         }
     }
+
     public void saveBooking() {
         boolean valid = validate(model);
         if (valid) {
@@ -163,5 +161,5 @@ public class FragmentBookingPresenter extends Presenter<FragmentBooking> {
         }
     }
 
-  
+
 }
