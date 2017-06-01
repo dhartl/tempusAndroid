@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import at.c02.tempus.R;
 import at.c02.tempus.db.entity.BookingEntity;
@@ -33,6 +34,8 @@ import nucleus.view.NucleusSupportFragment;
 @RequiresPresenter(FragmentBookingPresenter.class)
 public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPresenter> {
 
+    private static final String CLOCK_FORMAT = "%02d:%02d:%02d:%03d";
+
     @BindView(R.id.cbProject)
     protected Spinner cbProject;
 
@@ -48,9 +51,8 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     private ArrayAdapter<ProjectEntity> adapter;
 
     //Stopwatch
-    long StartTime, MillisecondTime, TimeBuff, UpdateTime = 0L;
+    long StartTime, TimeBuff, UpdateTime = 0L;
     Handler handler;
-    int Seconds, Minutes, MilliSeconds, Hours;
 
     public boolean Record_Active;
 
@@ -75,6 +77,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
                 getPresenter().setProject(null);
             }
         });
+        updateDisplayTime(0);
 
         return root;
     }
@@ -82,10 +85,10 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     @OnClick(R.id.btnRecordButton)
     public void onRecordClick() {
         if (Record_Active) {
-            tvHeading.setText("Wähle ein Projekt und drücke START");
+            tvHeading.setText(R.string.recording_start_hint);
             onRecordClick2();
             this.btnRecordButton.setBackgroundColor(Color.rgb(180, 243, 184));
-            this.btnRecordButton.setText("START");
+            this.btnRecordButton.setText(R.string.recording_start);
             getPresenter().saveRecordedBooking();
             Record_Active = false;
 
@@ -93,9 +96,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
             onRecordClick2();
             Record_Active = true;
-            tvHeading.setText("Drücke STOP wenn du fertig bist!");
+            tvHeading.setText(R.string.recording_stop_hint);
             btnRecordButton.setBackgroundColor(Color.RED);
-            btnRecordButton.setText("STOP");
+            btnRecordButton.setText(R.string.recording_stop);
             if (getPresenter().getModel().getProject() != null) {
                 getPresenter().createNewBookingEntity();
 
@@ -114,23 +117,9 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
 
                 @Override
                 public void run() {
-                    MillisecondTime = SystemClock.uptimeMillis() - StartTime;
+                    UpdateTime = TimeBuff + (SystemClock.uptimeMillis() - StartTime);
 
-                    UpdateTime = TimeBuff + MillisecondTime;
-
-                    Seconds = (int) (UpdateTime / 1000);
-
-                    Minutes = Seconds / 60;
-
-                    Hours = Minutes / 60;
-
-                    Seconds = Seconds % 60;
-
-                    MilliSeconds = (int) (UpdateTime % 1000);
-
-                    textView.setText("" + Hours + ":" + Minutes + ":"
-                            + String.format("%02d", Seconds) + ":"
-                            + String.format("%03d", MilliSeconds));
+                    updateDisplayTime(UpdateTime);
 
                     handler.postDelayed(this, 0);
                 }
@@ -140,8 +129,18 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
             handler.postDelayed(runnable, 0);
         } else {
             onStop();
-            textView.setText("" + String.format("%01d", 0) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00) + ":" + String.format("%02d", 00));
+            updateDisplayTime(0);
         }
+    }
+
+    public void updateDisplayTime(long timeInMilliseconds) {
+
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(timeInMilliseconds) % 60;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMilliseconds) % 60;
+        long hours = TimeUnit.MILLISECONDS.toHours(timeInMilliseconds);
+        long milliSeconds = timeInMilliseconds % 1000;
+
+        textView.setText(String.format(CLOCK_FORMAT, hours, minutes, seconds, milliSeconds));
     }
 
     @Override
@@ -157,7 +156,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     public void onCreateSuccessful(BookingEntity model) {
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
-                String.format("Die Aufzeichnung der Buchung %s hat begonnen!",
+                String.format(getString(R.string.recording_started),
                         projectName),
                 Toast.LENGTH_SHORT)
                 .show();
@@ -166,7 +165,7 @@ public class FragmentBooking extends NucleusSupportFragment<FragmentBookingPrese
     public void onSaveSuccessful(BookingEntity model) {
         String projectName = model.getProject() != null ? model.getProject().getName() : "";
         Toast.makeText(this.getContext(),
-                String.format("Die Buchung %s wurde gespeichert!",
+                String.format(getString(R.string.recording_stopped),
                         projectName),
                 Toast.LENGTH_SHORT)
                 .show();
