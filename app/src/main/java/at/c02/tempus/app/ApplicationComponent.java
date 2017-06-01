@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import at.c02.tempus.api.ApiModule;
 import at.c02.tempus.app.ui.AuthPresenter;
 import at.c02.tempus.app.ui.MainActivityPresenter;
+import at.c02.tempus.app.ui.booking.FragmentBookingPresenter;
 import at.c02.tempus.app.ui.bookinglist.BookingActivityPresenter;
 import at.c02.tempus.app.ui.bookinglist.FragmentBookingListPresenter;
 import at.c02.tempus.app.ui.report.ReportPresenter;
@@ -23,6 +24,8 @@ public interface ApplicationComponent {
     void inject(BookingActivityPresenter bookingActivityPresenter);
 
     void inject(FragmentBookingListPresenter fragmentBookingListPresenter);
+
+    void inject(FragmentBookingPresenter fragmentBookingPresenter);
 
     void inject(AuthPresenter authPresenter);
 

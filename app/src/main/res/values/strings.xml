@@ -22,4 +22,12 @@
     <string name="nav_sync">Synchronisieren</string>
     <string name="nav_logout">Logout</string>
 
+    <!-- Quickrecord labels -->
+    <string name="recording_start">START</string>
+    <string name="recording_start_hint">Wähle ein Projekt und drücke START</string>
+    <string name="recording_stop_hint">Drücke STOP wenn du fertig bist!</string>
+    <string name="recording_stop">STOP</string>
+    <string name="recording_started">Die Aufzeichnung der Buchung %s hat begonnen!</string>
+    <string name="recording_stopped">Die Buchung %s wurde gespeichert!</string>
+
 </resources>
